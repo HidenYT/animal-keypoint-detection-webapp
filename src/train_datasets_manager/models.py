@@ -21,7 +21,7 @@ class TrainDataset(models.Model):
     created_at = models.DateTimeField(default=datetime.now)
     updated_at = models.DateTimeField(default=datetime.now)
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='train_datasets')
 
 
     def get_absolute_url(self):
@@ -31,9 +31,9 @@ class TrainDataset(models.Model):
 class Skeleon(models.Model):
     kp_relations = models.JSONField()
 
-    train_dataset = models.OneToOneField(TrainDataset, on_delete=models.CASCADE)
+    train_dataset = models.OneToOneField(TrainDataset, on_delete=models.CASCADE, related_name='skeleton')
     
 
 class SkeletonKeypoint(models.Model):
     name = models.CharField(max_length=100)
-    skeleton = models.ForeignKey(Skeleon, on_delete=models.CASCADE)
+    skeleton = models.ForeignKey(Skeleon, on_delete=models.CASCADE, related_name='skeleton_keypoints')

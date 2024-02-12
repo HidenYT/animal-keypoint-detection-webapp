@@ -21,7 +21,7 @@ class InferenceVideo(models.Model):
     created_at = models.DateTimeField(default=datetime.now)
     updated_at = models.DateTimeField(default=datetime.now)
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='inference_videos')
 
     def get_absolute_url(self):
         return reverse("video_manager:detail_inference_video", args=[self.pk])

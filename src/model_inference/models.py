@@ -10,6 +10,6 @@ class InferredKeypoints(models.Model):
     started_inference_at = models.DateTimeField(default=datetime.now)
     finished_inference_at = models.DateTimeField(null=True, blank=True)
 
-    trained_neural_network = models.ForeignKey(TrainedNeuralNetwork, on_delete=models.DO_NOTHING)
+    trained_neural_network = models.ForeignKey(TrainedNeuralNetwork, on_delete=models.DO_NOTHING, related_name='inferred_keypoints_set')
 
-    inference_video = models.ForeignKey(InferenceVideo, on_delete=models.DO_NOTHING)
+    inference_video = models.ForeignKey(InferenceVideo, on_delete=models.DO_NOTHING, related_name='inferred_keypoints_set')

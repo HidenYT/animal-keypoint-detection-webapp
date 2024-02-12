@@ -15,6 +15,6 @@ class TrainedNeuralNetwork(models.Model):
     started_training_at = models.DateTimeField(default=datetime.now)
     finished_training_at = models.DateTimeField(null=True, blank=True)
 
-    train_dataset = models.ForeignKey(TrainDataset, on_delete=models.DO_NOTHING)
+    train_dataset = models.ForeignKey(TrainDataset, on_delete=models.DO_NOTHING, related_name='trained_neural_networks')
 
-    neural_network_type = models.ForeignKey(NeuralNetworkType, on_delete=models.DO_NOTHING)
+    neural_network_type = models.ForeignKey(NeuralNetworkType, on_delete=models.DO_NOTHING, related_name='trained_neural_networks')
