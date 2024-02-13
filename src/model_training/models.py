@@ -4,6 +4,18 @@ from train_datasets_manager.models import TrainDataset
 
 
 class NeuralNetworkType(models.Model):
+    DeepLabCut = "DeepLabCut"
+    SLEAP = "SLEAP"
+    DeepPoseKit = "DeepPoseKit"
+    AlphaTracher = "AlphaTracker"
+
+    NETWORKS = [
+        DeepLabCut,
+        SLEAP,
+        DeepPoseKit,
+        AlphaTracher,
+    ]
+
     name = models.CharField(max_length=100)
 
 

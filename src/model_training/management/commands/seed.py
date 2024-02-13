@@ -29,7 +29,7 @@ def clear_data():
 
 
 def create_neural_network_types():
-    names = ["DeepLabCut", "SLEAP", "DeepPoseKit", "AlphaTracker"]
+    names = NeuralNetworkType.NETWORKS
     for name in names:
         nn = NeuralNetworkType()
         nn.name = name
