@@ -160,9 +160,18 @@ TRAIN_DATASET_UPLOAD_DIR = "train_datasets"
 
 INFERENCE_VIDEO_UPLOAD_DIR = "inference_videos"
 
-
 # SENDFILE
 
 SENDFILE_BACKEND = "django_sendfile.backends.development"
 
 SENDFILE_ROOT = MEDIA_ROOT
+
+# Neural networks training
+
+TRAINING_DIR_PATH = MEDIA_ROOT / "network_training"
+
+DLC_PROJECTS_DIR_PATH = TRAINING_DIR_PATH / "deep_lab_cut_projects"
+
+DUMMY_VIDEO_NAME = "dummy.mp4"
+
+DUMMY_VIDEO_PATH = DLC_PROJECTS_DIR_PATH / DUMMY_VIDEO_NAME

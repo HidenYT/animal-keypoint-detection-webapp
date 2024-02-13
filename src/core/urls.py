@@ -24,4 +24,5 @@ urlpatterns = [
     path('auth/', include('authentication.urls')),
     path('train-datasets/', include('train_datasets_manager.urls')),
     path('inference-videos/', include('video_manager.urls')),
+    path('network-training/', include('model_training.urls')),
 ]
