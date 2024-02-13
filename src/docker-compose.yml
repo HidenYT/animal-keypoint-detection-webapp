@@ -3,18 +3,29 @@ services:
   backend:
     build: .
     image: animal_keypoint_detection_backend
+    command: python manage.py runserver 0.0.0.0:8000
     ports:
       - 8000:8000
     depends_on:
       - postgres
       - backend_migration
     volumes:
-      - .:/animal_keypoint_detection_backend_files
+      - uploads:/app/uploads
+  
+  celery_worker:
+    command: celery -A core worker -l INFO -P threads
+    image: animal_keypoint_detection_backend
+    depends_on:
+      - rabbitmq_broker
+    volumes:
+      - uploads:/app/uploads
+
   backend_migration:
     image: animal_keypoint_detection_backend
-    command: poetry run python manage.py migrate
+    command: bash -c "python manage.py migrate;python manage.py seed --mode=refresh"
     depends_on:
       - postgres
+
   postgres:
     image: postgres:16.1
     environment:
@@ -25,3 +36,11 @@ services:
       - 5432:5432
     volumes:
       - .:/docker-entrypoint-initdb.d
+
+  rabbitmq_broker:
+    image: rabbitmq
+    ports:
+      - 5672:5672 
+
+volumes:
+  uploads:
