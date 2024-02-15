@@ -1,0 +1,14 @@
+{% extends "base/base.html" %}
+
+{% block title %}Обучение{% endblock %}
+{% block content %}
+<div>
+    <p>
+        <a href="{{ url('network_training:start_dlc_network_training') }}">Обучить</a>
+    </p>
+    
+    {% for net in networks %}
+    <a href="{{ url('network_training:detail_trained_network', kwargs={'id':net.pk}) }}">{{ net.name }}</a>
+    {% endfor %}
+</div>
+{% endblock %}

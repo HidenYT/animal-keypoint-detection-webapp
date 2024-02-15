@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+
+{% block title %}Нейросеть "{{ net.name }}"{% endblock %}
+{% block content %}
+<div>
+    <h1>
+        {{ net.name }}
+    </h1>
+    <p>
+        Обучение начато: {{ net.started_training_at }}
+    </p>
+    <p>
+        Обучение окончено: 
+        {% if net.finished_training_at %}
+            {{ net.finished_training_at }}
+        {% else %}
+            ещё не окончено
+        {% endif %}
+    </p>
+    <p>
+        Базовая нейронная сеть: {{ net.neural_network_type.name}}
+    </p>
+    <p>
+        Датасет: <a href="{{ url('train_datasets_manager:detail_train_dataset', kwargs={'id': net.train_dataset.pk }) }}">{{ net.train_dataset.name }}</a>
+    </p>
+</div>
+{% endblock %}

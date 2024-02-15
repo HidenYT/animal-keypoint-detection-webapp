@@ -6,6 +6,7 @@ from model_training.network_training_runners.dlc_training_runner import DLCTrain
 from model_training.training_config_adapters.dlc_training_config_adapter import BaseTrainingConfigAdapter, DeepLabCutTrainingConfigAdapter
 from train_datasets_manager.models import TrainDataset
 from .dataset_preparation.dlc_dataset_preparator import DLCDatasetPreparator
+from django.contrib.auth.models import User
 
 
 def create_trained_network_object(adapter: BaseTrainingConfigAdapter, 
@@ -22,6 +23,7 @@ def create_trained_network_object(adapter: BaseTrainingConfigAdapter,
     nn.file_path = nn_path
     nn.started_training_at = datetime.datetime.now()
     nn.train_dataset = ds
+    nn.user = User.objects.get(username=adapter.username)
     nn.neural_network_type = NeuralNetworkType.objects.get(name=nn_type)
     nn.save()
     return nn
