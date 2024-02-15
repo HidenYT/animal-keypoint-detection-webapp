@@ -1,6 +1,5 @@
 from core import celery_app
 from model_inference.inference_runners.dlc_inference_runner import DLCInferenceRunner
-from model_inference.models import InferredKeypoints
 from model_training.models import TrainedNeuralNetwork
 from video_manager.models import InferenceVideo
 from django.contrib.auth.models import User

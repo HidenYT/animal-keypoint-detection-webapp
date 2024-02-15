@@ -1,7 +1,6 @@
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from sklearn import neural_network
 from model_inference.forms import RunTrainedNetworkForm
 from model_inference.inference_task_runners import DLCInferenceTaskRunner
 from model_inference.models import InferredKeypoints

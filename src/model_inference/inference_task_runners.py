@@ -1,8 +1,6 @@
 from typing import Any, Callable, Union
 from celery import Task
-
 from model_inference.tasks import dlc_inferrence
-from model_training.models import TrainedNeuralNetwork
 
 
 class InferenceTaskRunner:

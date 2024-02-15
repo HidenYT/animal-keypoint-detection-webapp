@@ -9,7 +9,6 @@ from model_inference.inference_runners.inference_runner import InferenceRunner
 from django.conf import settings
 from secrets import token_urlsafe
 from model_inference.models import InferredKeypoints
-
 from model_training.models import TrainedNeuralNetwork
 from video_manager.models import InferenceVideo
 
