@@ -1,0 +1,17 @@
+{% extends "base/base.html" %}
+
+{% block title %}Результаты запусков{% endblock %}
+{% block content %}
+<div>
+    <p>
+        <a href="{{ url('network_inference:start_dlc_network_inference') }}">Выбрать и запустить нейросеть</a>
+    </p>
+    
+    {% for res in results %}
+    <p>
+        <a href="{{ url('network_inference:detail_inference_results', kwargs={'id':res.pk}) }}">Запуск нейросети "{{res.trained_neural_network.name}}" на видео "{{res.inference_video.name}}" от {{res.started_inference_at}}</a>
+    </p>
+
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.http import HttpRequest
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from model_training.models import TrainedNeuralNetwork
 from model_training.training_task_runners import DeepLabCutTrainingTaskRunner
 from train_datasets_manager.models import TrainDataset
@@ -18,6 +19,7 @@ def start_dlc_network_training(request: HttpRequest):
             ds = get_object_or_404(TrainDataset, pk=ds_id, user=request.user)
             trainer = DeepLabCutTrainingTaskRunner(request.user.username, ds, form.cleaned_data)
             trainer.start_training()
+            return redirect(reverse("network_training:list_trained_networks"))
 
     ctx = {
         "form": form,

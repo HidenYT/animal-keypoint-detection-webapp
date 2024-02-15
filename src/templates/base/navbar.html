@@ -21,6 +21,9 @@
             <a href="{{ url('network_training:list_trained_networks') }}">Обучение</a>
         </li>
         <li class="nav-button">
+            <a href="{{ url('network_inference:list_inference_results') }}">Запуск</a>
+        </li>
+        <li class="nav-button">
             <a href="{{ url('auth:logout') }}">Выйти</a>
         </li>
         {% endif %}

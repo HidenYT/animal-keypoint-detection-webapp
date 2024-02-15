@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 
 class InferredKeypoints(models.Model):
-    keypoints = models.JSONField()
+    keypoints = models.JSONField(null=True, blank=True)
 
     started_inference_at = models.DateTimeField(default=datetime.now)
     finished_inference_at = models.DateTimeField(null=True, blank=True)

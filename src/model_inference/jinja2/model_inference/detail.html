@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+
+{% block title %}Результаты для видео "{{kps.inference_video.name}}"{% endblock %}
+{% block content %}
+<div>
+    <h1>
+        Результаты для видео "{{ kps.inference_video.name }}" нейросети "{{kps.trained_neural_network.name}}"
+    </h1>
+    <p>
+        Работа начата: {{ kps.started_inference_at }}
+    </p>
+    <p>
+        Работа окончена: 
+        {% if kps.finished_inference_at %}
+            {{ kps.finished_inference_at }}
+        {% else %}
+            ещё не окончена
+        {% endif %}
+    </p>
+    <p>
+        Нейросеть: <a href="{{ url('network_training:detail_trained_network', kwargs={'id': kps.trained_neural_network.pk }) }}">{{ kps.trained_neural_network.name }}</a>
+    </p>
+    <p>
+        Видео: <a href="{{ url('video_manager:detail_inference_video', kwargs={'id': kps.inference_video.pk }) }}">{{ kps.inference_video.name }}</a>
+    </p>
+</div>
+{% endblock %}
