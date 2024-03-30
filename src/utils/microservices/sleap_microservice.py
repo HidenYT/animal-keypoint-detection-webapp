@@ -1,6 +1,6 @@
-from utils.microservices.microservice import Microservice
+from utils.microservices.microservice import DefaultMicroservice
 from django.conf import settings
 
 
-class SLEAPMicroservice(Microservice):
+class SLEAPMicroservice(DefaultMicroservice):
     MICROSERVICE_URL = settings.SLEAP_MICROSERVICE_URL

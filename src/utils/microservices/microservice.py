@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import os
 from typing import Any
 import base64
@@ -6,7 +7,25 @@ import requests
 from urllib.parse import urljoin
 
 
-class Microservice:
+class Microservice(ABC):
+    @abstractmethod
+    def send_train_network_request(self, dataset_path: str, training_config: dict[str, Any]) -> int:
+        pass
+
+    @abstractmethod
+    def send_learning_stats_request(self, model_uid: UUID) -> int:
+        pass
+
+    @abstractmethod
+    def send_video_inference_request(self, video_path: str, model_uid: UUID) -> int:
+        pass
+
+    @abstractmethod
+    def send_inference_results_request(self, results_id: int) -> int:
+        pass
+
+
+class DefaultMicroservice(Microservice):
 
     MICROSERVICE_URL: str
     
