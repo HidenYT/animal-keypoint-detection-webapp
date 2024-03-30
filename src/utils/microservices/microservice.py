@@ -29,7 +29,7 @@ class DefaultMicroservice(Microservice):
 
     MICROSERVICE_URL: str
     
-    def send_train_network_request(self, dataset_path: str, training_config: dict[str, Any]) -> int:
+    def send_train_network_request(self, dataset_path: str, training_config: dict[str, Any]) -> requests.Response:
         with open(dataset_path, "rb") as f:
             dataset_base64 = base64.b64encode(f.read()).decode()
         json = {
@@ -41,19 +41,19 @@ class DefaultMicroservice(Microservice):
             url=urljoin(self.MICROSERVICE_URL, "api/train-network"),
             json=json,
         )
-        return response.status_code
+        return response
     
-    def send_learning_stats_request(self, model_uid: UUID) -> int:
+    def send_learning_stats_request(self, model_uid: UUID) -> requests.Response:
         response = requests.request(
             method="GET",
             url=urljoin(self.MICROSERVICE_URL, "api/learning-stats"),
-            json={
+            params={
                 "model_uid": str(model_uid)
             },
         )
-        return response.status_code
+        return response
     
-    def send_video_inference_request(self, video_path: str, model_uid: UUID) -> int:
+    def send_video_inference_request(self, video_path: str, model_uid: UUID) -> requests.Response:
         with open(video_path, "rb") as f:
             video_base64 = base64.b64encode(f.read()).decode()
         json = {
@@ -66,14 +66,14 @@ class DefaultMicroservice(Microservice):
             url=urljoin(self.MICROSERVICE_URL, "api/video-inference"),
             json=json,
         )
-        return response.status_code
+        return response
     
-    def send_inference_results_request(self, results_id: int) -> int:
+    def send_inference_results_request(self, results_id: int) -> requests.Response:
         response = requests.request(
             method="GET",
             url=urljoin(self.MICROSERVICE_URL, "api/inference-results"),
-            json={
+            params={
                 "results_id": results_id,
             },
         )
-        return response.status_code
+        return response
