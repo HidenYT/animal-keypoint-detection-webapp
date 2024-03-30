@@ -4,7 +4,8 @@
 {% block content %}
 <div>
     <p>
-        <a href="{{ url('network_training:start_dlc_network_training') }}">Обучить</a>
+        <a href="{{ url('network_training:start_dlc_network_training') }}">Обучить DLC</a>
+        <a href="{{ url('network_training:start_sleap_network_training') }}">Обучить SLEAP</a>
     </p>
     
     {% for net in networks %}

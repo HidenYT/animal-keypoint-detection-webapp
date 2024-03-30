@@ -1,0 +1,39 @@
+{% extends "base/base.html" %}
+
+{% block title %}Обучение нейросети SLEAP{% endblock %}
+{% block content %}
+<div>
+    <form method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        {% for field in form %}
+            {% if field.name == "pretrained_encoder" %}
+            <div style="display: none;" id="pretrained_encoder_container">
+            {% endif %}
+            {{field.errors}}
+            {{field.label_tag()}}
+            {{field}}
+            <br>
+            {% if field.name == "pretrained_encoder" %}
+            </div>
+            {% endif %}
+        {% endfor %}
+        <button type="submit">Начать обучение</button>
+    </form>
+</div>
+<script>
+    window.onload = function() {
+        onBackboneModelChanged();
+    }
+    
+    function onBackboneModelChanged() {
+        let select = document.getElementById("{{ form.backbone_model.auto_id }}");
+        let pretrainedEncoderSelect = document.getElementById("pretrained_encoder_container");
+        if(select.value == "pretrained_encoder") {
+            pretrainedEncoderSelect.style.display = "block";
+        } else {
+            pretrainedEncoderSelect.style.display = "none";
+        }
+    }
+    
+</script>
+{% endblock %}
