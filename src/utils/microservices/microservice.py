@@ -9,19 +9,23 @@ from urllib.parse import urljoin
 
 class Microservice(ABC):
     @abstractmethod
-    def send_train_network_request(self, dataset_path: str, training_config: dict[str, Any]) -> int:
+    def send_train_network_request(self, dataset_path: str, training_config: dict[str, Any]) -> requests.Response:
         pass
 
     @abstractmethod
-    def send_learning_stats_request(self, model_uid: UUID) -> int:
+    def send_learning_stats_request(self, model_uid: UUID) -> requests.Response:
         pass
 
     @abstractmethod
-    def send_video_inference_request(self, video_path: str, model_uid: UUID) -> int:
+    def send_video_inference_request(self, video_path: str, model_uid: UUID) -> requests.Response:
         pass
 
     @abstractmethod
-    def send_inference_results_request(self, results_id: int) -> int:
+    def send_inference_results_request(self, results_id: int) -> requests.Response:
+        pass
+
+    @abstractmethod
+    def send_model_info_request(self, model_uid: UUID) -> requests.Response:
         pass
 
 
@@ -75,5 +79,15 @@ class DefaultMicroservice(Microservice):
             params={
                 "results_id": results_id,
             },
+        )
+        return response
+    
+    def send_model_info_request(self, model_uid: UUID) -> requests.Response:
+        response = requests.request(
+            method="GET",
+            url=urljoin(self.MICROSERVICE_URL, "api/model-info"),
+            params={
+                "model_uid": str(model_uid),
+            }
         )
         return response

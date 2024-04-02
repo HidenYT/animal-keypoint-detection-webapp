@@ -21,6 +21,29 @@
         Базовая нейронная сеть: {{ net.neural_network_type.name }}
     </p>
     <p>
+        Кодировщик: {{ info.backbone_model }}
+    </p>
+    {% if info.backbone_model == "pretrained_encoder" %}
+    <p>
+        Предобученный кодировщик: {{ info.pretrained_encoder }}
+    </p>
+    {% endif %}
+    <p>
+        Доля тестовых данных: {{ info.test_fraction }}
+    </p>
+    <p>
+        Количество эпох: {{ info.num_epochs }}
+    </p>
+    <p>
+        Скорость обучения: {{info.learning_rate}}
+    </p>
+    <p>
+        Плотность нормального распределения для выходного слоя: {{ info.heads_sigma }}
+    </p>
+    <p>
+        Шаг в выходном слое: {{ info.heads_output_stride }}
+    </p>
+    <p>
         Датасет: <a href="{{ url('train_datasets_manager:detail_train_dataset', kwargs={'id': net.train_dataset.pk }) }}">{{ net.train_dataset.name }}</a>
     </p>
 </div>

@@ -6,7 +6,7 @@ from django.urls import reverse
 from model_training.models import NeuralNetworkType, TrainedNeuralNetwork
 from model_training.training_task_runners import DeepLabCutTrainingTaskRunner
 from train_datasets_manager.models import TrainDataset
-from utils.microservices.sleap_microservice import SLEAPMicroservice
+from utils.microservices.sleap_microservice import SLEAP_MICROSERVICE
 from .forms import DeeplabcutNetworkTrainingForm, SLEAPNetworkTrainingForm
 
 
@@ -37,15 +37,15 @@ def start_sleap_network_training(request: HttpRequest):
         if form.is_valid():
             ds_id = form.cleaned_data["dataset"]
             ds = get_object_or_404(TrainDataset, pk=ds_id, user=request.user)
-            response = SLEAPMicroservice().send_train_network_request(ds.file.path, form.cleaned_data)
+            response = SLEAP_MICROSERVICE.send_train_network_request(ds.file.path, form.cleaned_data)
             if response.status_code == 200:
-                nn = TrainedNeuralNetwork()
-                nn.name = form.cleaned_data["trained_network_name"]
-                nn.file_path = response.json()["model_uid"]
-                nn.train_dataset = ds
-                nn.neural_network_type = NeuralNetworkType.objects.get(name="SLEAP")
-                nn.user = request.user
-                nn.save()
+                nn = TrainedNeuralNetwork.objects.create(
+                    name=form.cleaned_data["trained_network_name"],
+                    file_path = response.json()["model_uid"],
+                    train_dataset = ds,
+                    neural_network_type = NeuralNetworkType.objects.get(name="SLEAP"),
+                    user = request.user
+                )
                 return redirect(reverse("network_training:detail_trained_network", kwargs={"id": nn.pk}))
             return redirect(reverse("network_training:list_trained_networks"))
     ctx = {
@@ -56,15 +56,22 @@ def start_sleap_network_training(request: HttpRequest):
 @login_required
 def get_model_training_stats(request: HttpRequest, model_id: int):
     model = get_object_or_404(TrainedNeuralNetwork, pk=model_id, user=request.user)
-    response = SLEAPMicroservice().send_learning_stats_request(UUID(model.file_path))
+    response = SLEAP_MICROSERVICE.send_learning_stats_request(UUID(model.file_path))
     return JsonResponse(response.json())
 
 @login_required
 def detail_trained_network_view(request: HttpRequest, id: int):
     net = get_object_or_404(TrainedNeuralNetwork, pk=id, user=request.user)
-    return render(request, "model_training/detail.html", {"net": net})
+    info = {
+        "started_training_at": net.started_training_at,
+        "finished_training_at": net.finished_training_at,
+    }
+    if net.neural_network_type.name == NeuralNetworkType.SLEAP:
+        info = SLEAP_MICROSERVICE.send_model_info_request(UUID(net.file_path)).json()
+        return render(request, "model_training/sleap_detail.html", {"info": info, "net": net})
+    return render(request, "model_training/detail.html", {"info": info, "net": net})
 
 @login_required
 def list_trained_networks_view(request: HttpRequest):
-    networks = TrainedNeuralNetwork.objects.filter(user=request.user)
+    networks = TrainedNeuralNetwork.objects.filter(user=request.user).order_by("-started_training_at")
     return render(request, "model_training/list.html", {"networks": networks})
