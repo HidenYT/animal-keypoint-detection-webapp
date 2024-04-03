@@ -1,9 +1,10 @@
+from datetime import datetime
 import json
 from uuid import UUID
 from django.http import HttpRequest, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from requests import Response
+from django.views.decorators.csrf import csrf_exempt
 from model_inference.forms import RunTrainedNetworkForm
 from model_inference.inference_task_runners import DLCInferenceTaskRunner
 from model_inference.models import InferredKeypoints
@@ -92,6 +93,7 @@ def list_inference_results_view(request: HttpRequest):
     return render(request, "model_inference/list.html", {"results": results})
 
 @check_token
+@csrf_exempt
 def inference_results_view(request: HttpRequest):
     try:
         results = json.loads(request.body)
@@ -104,6 +106,7 @@ def inference_results_view(request: HttpRequest):
                 results_id=id
             )
             obj.keypoints = kps
+            obj.finished_inference_at = datetime.now()
             obj.save()
     except:
         return HttpResponseBadRequest("You must provide a valid json of the inferred keypoints.")
