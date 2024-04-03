@@ -1,8 +1,9 @@
 import json
 from uuid import UUID
-from django.http import HttpRequest, HttpResponseBadRequest
+from django.http import HttpRequest, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from requests import Response
 from model_inference.forms import RunTrainedNetworkForm
 from model_inference.inference_task_runners import DLCInferenceTaskRunner
 from model_inference.models import InferredKeypoints
@@ -106,3 +107,4 @@ def inference_results_view(request: HttpRequest):
             obj.save()
     except:
         return HttpResponseBadRequest("You must provide a valid json of the inferred keypoints.")
+    return JsonResponse({"response": "success"})
