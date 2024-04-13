@@ -23,5 +23,6 @@
     <p>
         Видео: <a href="{{ url('video_manager:detail_inference_video', kwargs={'id': kps.inference_video.pk }) }}">{{ kps.inference_video.name }}</a>
     </p>
+    <a href="{{url('network_inference:download_inference_results', kwargs={'id': kps.pk})}}">Скачать результаты</a>
 </div>
 {% endblock %}

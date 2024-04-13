@@ -48,45 +48,5 @@
     </p>
 </div>
 
-<script type="module" src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
-<script type="module">
-    window.onload = function() {
-        getTrainingStats();
-        setInterval(getTrainingStats, 60*1000);
-    }
-    let createdCharts = false;
-    let canvasesAndCharts = {};
-    function createCanvases(labels) {
-        let canvases = {};
-        for(let label of labels) {
-            let canvasContainer = document.createElement("div");
-            canvasContainer.style.width = "500px";
-            let canvas = document.createElement("canvas");
-            canvas.id = label + "_canvas";
-            canvasContainer.append(canvas);
-            document.body.append(canvasContainer);
-            let chart = new Chart(canvas.getContext('2d'), {type: 'line', options:{animation: {duration: 0}}});
-            canvases[canvas.id] = chart;
-        }
-        return canvases;
-    }
-    function getTrainingStats() {
-        fetch("http://127.0.0.1:8000/network-training/training-stats/{{net.pk}}").then((res) => {
-            return res.json();
-        }).then(
-            (json) => {
-                if(Object.keys(json).length == 0) return;
-                if(!createdCharts) {
-                    canvasesAndCharts = createCanvases(Object.keys(json));
-                    createdCharts = true;
-                }
-
-                for(let label of Object.keys(json)) {   
-                    canvasesAndCharts[label + "_canvas"].data.datasets = [{data: json[label], label: label}];
-                    canvasesAndCharts[label + "_canvas"].update();
-                }
-            }
-        );
-    }
-</script>
+{% include 'plots/training_stats.html'%}
 {% endblock %}

@@ -22,8 +22,9 @@ class DeeplabcutNetworkTrainingForm(BaseNetworkTrainingForm):
         ("mobilenet_v2_0.35", "MobileNet v2-0.35"),
     ]
 
-    network_type = forms.ChoiceField(choices=DLC_NET_TYPES)
-    max_iters = forms.IntegerField(min_value=0)
+    test_fraction = forms.FloatField(max_value=1, min_value=0)
+    num_epochs = forms.IntegerField(min_value=1)
+    backbone_model = forms.ChoiceField(choices=DLC_NET_TYPES)
 
 
 class SLEAPNetworkTrainingForm(BaseNetworkTrainingForm):

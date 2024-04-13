@@ -1,11 +1,12 @@
 from uuid import UUID
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, HttpResponseNotFound, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from model_training.models import NeuralNetworkType, TrainedNeuralNetwork
-from model_training.training_task_runners import DeepLabCutTrainingTaskRunner
 from train_datasets_manager.models import TrainDataset
+from utils.microservices.dlc_microservice import DLC_MICROSERVICE
+from utils.microservices.microservice import Microservice
 from utils.microservices.sleap_microservice import SLEAP_MICROSERVICE
 from .forms import DeeplabcutNetworkTrainingForm, SLEAPNetworkTrainingForm
 
@@ -19,10 +20,17 @@ def start_dlc_network_training(request: HttpRequest):
         if form.is_valid():
             ds_id = form.cleaned_data["dataset"]
             ds = get_object_or_404(TrainDataset, pk=ds_id, user=request.user)
-            trainer = DeepLabCutTrainingTaskRunner(request.user.username, ds, form.cleaned_data)
-            trainer.start_training()
+            response = DLC_MICROSERVICE.send_train_network_request(ds.file.path, form.cleaned_data)
+            if response.status_code == 200:
+                nn = TrainedNeuralNetwork.objects.create(
+                    name=form.cleaned_data["trained_network_name"],
+                    file_path = response.json()["model_uid"],
+                    train_dataset = ds,
+                    neural_network_type = NeuralNetworkType.objects.get(name=NeuralNetworkType.DeepLabCut),
+                    user = request.user
+                )
+                return redirect(reverse("network_training:detail_trained_network", kwargs={"id": nn.pk}))
             return redirect(reverse("network_training:list_trained_networks"))
-
     ctx = {
         "form": form,
     }
@@ -43,7 +51,7 @@ def start_sleap_network_training(request: HttpRequest):
                     name=form.cleaned_data["trained_network_name"],
                     file_path = response.json()["model_uid"],
                     train_dataset = ds,
-                    neural_network_type = NeuralNetworkType.objects.get(name="SLEAP"),
+                    neural_network_type = NeuralNetworkType.objects.get(name=NeuralNetworkType.SLEAP),
                     user = request.user
                 )
                 return redirect(reverse("network_training:detail_trained_network", kwargs={"id": nn.pk}))
@@ -56,7 +64,15 @@ def start_sleap_network_training(request: HttpRequest):
 @login_required
 def get_model_training_stats(request: HttpRequest, model_id: int):
     model = get_object_or_404(TrainedNeuralNetwork, pk=model_id, user=request.user)
-    response = SLEAP_MICROSERVICE.send_learning_stats_request(UUID(model.file_path))
+    model_uid = UUID(model.file_path)
+    microservice: Microservice = None
+    if model.neural_network_type.name == NeuralNetworkType.SLEAP:
+        microservice = SLEAP_MICROSERVICE
+    elif model.neural_network_type.name == NeuralNetworkType.DeepLabCut:
+        microservice = DLC_MICROSERVICE
+    else:
+        return HttpResponseNotFound(f"Can't use neural network with type {model.neural_network_type.name}")
+    response = microservice.send_learning_stats_request(model_uid)
     return JsonResponse(response.json())
 
 @login_required
@@ -69,7 +85,9 @@ def detail_trained_network_view(request: HttpRequest, id: int):
     if net.neural_network_type.name == NeuralNetworkType.SLEAP:
         info = SLEAP_MICROSERVICE.send_model_info_request(UUID(net.file_path)).json()
         return render(request, "model_training/sleap_detail.html", {"info": info, "net": net})
-    return render(request, "model_training/detail.html", {"info": info, "net": net})
+    elif net.neural_network_type.name == NeuralNetworkType.DeepLabCut:
+        info = DLC_MICROSERVICE.send_model_info_request(UUID(net.file_path)).json()
+        return render(request, "model_training/detail.html", {"info": info, "net": net})
 
 @login_required
 def list_trained_networks_view(request: HttpRequest):

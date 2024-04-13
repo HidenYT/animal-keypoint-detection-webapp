@@ -20,9 +20,9 @@ class Microservice(ABC):
     def send_video_inference_request(self, video_path: str, model_uid: UUID) -> requests.Response:
         pass
 
-    @abstractmethod
-    def send_inference_results_request(self, results_id: int) -> requests.Response:
-        pass
+    # @abstractmethod
+    # def send_inference_results_request(self, results_id: int) -> requests.Response:
+    #     pass
 
     @abstractmethod
     def send_model_info_request(self, model_uid: UUID) -> requests.Response:
@@ -72,15 +72,15 @@ class DefaultMicroservice(Microservice):
         )
         return response
     
-    def send_inference_results_request(self, results_id: int) -> requests.Response:
-        response = requests.request(
-            method="GET",
-            url=urljoin(self.MICROSERVICE_URL, "api/inference-results"),
-            params={
-                "results_id": results_id,
-            },
-        )
-        return response
+    # def send_inference_results_request(self, results_id: int) -> requests.Response:
+    #     response = requests.request(
+    #         method="GET",
+    #         url=urljoin(self.MICROSERVICE_URL, "api/inference-results"),
+    #         params={
+    #             "results_id": results_id,
+    #         },
+    #     )
+    #     return response
     
     def send_model_info_request(self, model_uid: UUID) -> requests.Response:
         response = requests.request(
