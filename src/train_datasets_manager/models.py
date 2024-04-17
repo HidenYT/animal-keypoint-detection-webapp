@@ -26,14 +26,3 @@ class TrainDataset(models.Model):
 
     def get_absolute_url(self):
         return reverse('train_datasets_manager:detail_train_dataset', kwargs={"id": self.pk})
-
-
-class Skeleon(models.Model):
-    kp_relations = models.JSONField()
-
-    train_dataset = models.OneToOneField(TrainDataset, on_delete=models.CASCADE, related_name='skeleton')
-    
-
-class SkeletonKeypoint(models.Model):
-    name = models.CharField(max_length=100)
-    skeleton = models.ForeignKey(Skeleon, on_delete=models.CASCADE, related_name='skeleton_keypoints')

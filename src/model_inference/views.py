@@ -108,26 +108,3 @@ def download_inference_results_view(request: HttpRequest, id: int):
 def list_inference_results_view(request: HttpRequest):
     results = request.user.inferred_keypoints_set.order_by("-started_inference_at").all()
     return render(request, "model_inference/list.html", {"results": results})
-
-@check_token
-@csrf_exempt
-def inference_results_view(request: HttpRequest):
-    try:
-        results = json.loads(request.body)
-        sender = results["sender"]
-        for inferred_kps in results["results"]:
-            id = inferred_kps["id"]
-            kps = inferred_kps["keypoints"]
-            try:
-                obj = InferredKeypoints.objects.get(
-                    trained_neural_network__neural_network_type__name=sender, 
-                    results_id=id
-                )
-                obj.keypoints = kps
-                obj.finished_inference_at = datetime.now()
-                obj.save()
-            except InferredKeypoints.DoesNotExist as e:
-                print(f"Inferred keypoints with id {id} and network {sender} do not exist.")
-    except:
-        return HttpResponseBadRequest("You must provide a valid json of the inferred keypoints.")
-    return JsonResponse({"response": "success"})
