@@ -21,7 +21,11 @@ class Microservice(ABC):
         pass
 
     @abstractmethod
-    def send_inference_results_request(self, results_id: int) -> requests.Response:
+    def send_inference_results_request(self, results_id: list[int]) -> requests.Response:
+        pass
+
+    @abstractmethod
+    def send_training_finished_at_request(self, model_ids: list[int]) -> requests.Response:
         pass
 
 
@@ -74,6 +78,16 @@ class DefaultMicroservice(Microservice):
             url=urljoin(self.MICROSERVICE_URL, "api/inference-results"),
             params={
                 "ids": ",".join(map(str, result_ids)),
+            },
+        )
+        return response
+    
+    def send_training_finished_at_request(self, model_ids: list[int]) -> requests.Response:
+        response = requests.request(
+            method="GET",
+            url=urljoin(self.MICROSERVICE_URL, "api/get-finished-training-at"),
+            params={
+                "uids": ",".join(map(str, model_ids)),
             },
         )
         return response
