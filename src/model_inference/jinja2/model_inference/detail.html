@@ -4,7 +4,7 @@
 {% block content %}
 <div>
     <h1>
-        Результаты для видео "{{ kps.inference_video.name }}" нейросети "{{kps.trained_neural_network.name}}"
+        Результаты для видео "{{ kps.inference_video.name }}" нейросети "{{net.name}}"
     </h1>
     <p>
         Работа начата: {{ kps.started_inference_at }}
@@ -18,7 +18,16 @@
         {% endif %}
     </p>
     <p>
-        Нейросеть: <a href="{{ url('network_training:detail_trained_network', kwargs={'id': kps.trained_neural_network.pk }) }}">{{ kps.trained_neural_network.name }}</a>
+        Нейросеть: 
+        <a href="{{ url(
+            'network_training:detail_trained_network', 
+            kwargs={
+                'id': net.pk, 
+                'neural_network_type': neural_network_type
+            }) 
+        }}">
+            {{ net.name }}
+        </a>
     </p>
     <p>
         Видео: <a href="{{ url('video_manager:detail_inference_video', kwargs={'id': kps.inference_video.pk }) }}">{{ kps.inference_video.name }}</a>

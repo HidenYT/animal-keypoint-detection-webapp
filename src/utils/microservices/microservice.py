@@ -24,10 +24,6 @@ class Microservice(ABC):
     def send_inference_results_request(self, results_id: int) -> requests.Response:
         pass
 
-    @abstractmethod
-    def send_model_info_request(self, model_uid: UUID) -> requests.Response:
-        pass
-
 
 class DefaultMicroservice(Microservice):
 
@@ -79,15 +75,5 @@ class DefaultMicroservice(Microservice):
             params={
                 "ids": ",".join(map(str, result_ids)),
             },
-        )
-        return response
-    
-    def send_model_info_request(self, model_uid: UUID) -> requests.Response:
-        response = requests.request(
-            method="GET",
-            url=urljoin(self.MICROSERVICE_URL, "api/model-info"),
-            params={
-                "model_uid": str(model_uid),
-            }
         )
         return response

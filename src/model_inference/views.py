@@ -1,14 +1,13 @@
 from datetime import datetime
 import json
+from typing import Iterable
 from uuid import UUID
-from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 from model_inference.forms import RunTrainedNetworkForm
 from model_inference.models import InferredKeypoints
-from model_training.models import NeuralNetworkType, TrainedNeuralNetwork
-from utils.check_token import check_token
+from model_training.models import DLCNeuralNetwork, NeuralNetworkType, SLEAPNeuralNetwork
 from utils.microservices.dlc_microservice import DLC_MICROSERVICE
 from utils.microservices.sleap_microservice import SLEAP_MICROSERVICE
 from video_manager.models import InferenceVideo
@@ -18,34 +17,34 @@ from video_manager.models import InferenceVideo
 def start_dlc_network_inference_view(request: HttpRequest):
     form = RunTrainedNetworkForm(request.POST or None)
     form.fields["trained_network"].choices = [
-        (net.id, net.name) 
+        (net.pk, net.name) 
         for net in 
-        TrainedNeuralNetwork.objects.filter(
-            user=request.user, 
-            neural_network_type__name=NeuralNetworkType.DeepLabCut
-        )
+        DLCNeuralNetwork.objects.filter(user=request.user)
     ]
     form.fields["video"].choices = [
-        (video.id, video.name) for video in request.user.inference_videos.all()
+        (video.pk, video.name) for video in request.user.inference_videos.all()
     ]
     if request.method == "POST":
         if form.is_valid():
-            model = get_object_or_404(TrainedNeuralNetwork, 
-                              user=request.user, 
-                              pk=form.cleaned_data['trained_network'], 
-                              neural_network_type__name=NeuralNetworkType.DeepLabCut)
-            video = get_object_or_404(InferenceVideo, 
-                              user=request.user, 
-                              pk=form.cleaned_data['video'])
+            model = get_object_or_404(
+                DLCNeuralNetwork, 
+                user=request.user, 
+                pk=form.cleaned_data['trained_network']
+            )
+            video = get_object_or_404(
+                InferenceVideo, 
+                user=request.user, 
+                pk=form.cleaned_data['video']
+            )
             response = DLC_MICROSERVICE.send_video_inference_request(
                 video.file.path,
-                UUID(model.file_path),
+                UUID(model.model_uid),
             )
             if response.status_code == 200:
                 response = response.json()
                 kps = InferredKeypoints.objects.create(
                     results_id=response["results_id"],
-                    trained_neural_network=model,
+                    dlc_neural_network=model,
                     user=request.user,
                     inference_video=video,
                 )
@@ -57,34 +56,34 @@ def start_dlc_network_inference_view(request: HttpRequest):
 def start_sleap_network_inference_view(request: HttpRequest):
     form = RunTrainedNetworkForm(request.POST or None)
     form.fields["trained_network"].choices = [
-        (net.id, net.name) 
+        (net.pk, net.name) 
         for net in 
-        TrainedNeuralNetwork.objects.filter(
-            user=request.user, 
-            neural_network_type__name=NeuralNetworkType.SLEAP
-        )
+        SLEAPNeuralNetwork.objects.filter(user=request.user)
     ]
     form.fields["video"].choices = [
-        (video.id, video.name) for video in request.user.inference_videos.all()
+        (video.pk, video.name) for video in request.user.inference_videos.all()
     ]
     if request.method == "POST":
         if form.is_valid():
-            net = get_object_or_404(TrainedNeuralNetwork, 
-                              user=request.user, 
-                              pk=form.cleaned_data['trained_network'], 
-                              neural_network_type__name=NeuralNetworkType.SLEAP)
-            video = get_object_or_404(InferenceVideo, 
-                              user=request.user, 
-                              pk=form.cleaned_data['video'])
+            net = get_object_or_404(
+                SLEAPNeuralNetwork, 
+                user=request.user, 
+                pk=form.cleaned_data['trained_network'],
+            )
+            video = get_object_or_404(
+                InferenceVideo, 
+                user=request.user, 
+                pk=form.cleaned_data['video']
+            )
             response = SLEAP_MICROSERVICE.send_video_inference_request(
                 video.file.path,
-                UUID(net.file_path)
+                UUID(net.model_uid)
             )
             if response.status_code == 200:
                 response = response.json()
                 kps = InferredKeypoints.objects.create(
                     results_id=response["results_id"],
-                    trained_neural_network=net,
+                    sleap_neural_network=net,
                     user=request.user,
                     inference_video=video,
                 )
@@ -95,7 +94,15 @@ def start_sleap_network_inference_view(request: HttpRequest):
 @login_required
 def detail_inference_results_view(request: HttpRequest, id: int):
     kps = get_object_or_404(InferredKeypoints, user=request.user, pk=id)
-    return render(request, "model_inference/detail.html", {"kps": kps})
+    net_type = None
+    net = None
+    if kps.sleap_neural_network: 
+        net_type = NeuralNetworkType.SLEAP
+        net = kps.sleap_neural_network
+    elif kps.dlc_neural_network: 
+        net_type = NeuralNetworkType.DLC
+        net = kps.dlc_neural_network
+    return render(request, "model_inference/detail.html", {"kps": kps, "neural_network_type": net_type, "net": net})
 
 @login_required
 def download_inference_results_view(request: HttpRequest, id: int):
@@ -106,5 +113,5 @@ def download_inference_results_view(request: HttpRequest, id: int):
 
 @login_required
 def list_inference_results_view(request: HttpRequest):
-    results = request.user.inferred_keypoints_set.order_by("-started_inference_at").all()
+    results: Iterable[InferredKeypoints] = request.user.inferred_keypoints_set.order_by("-started_inference_at").all()
     return render(request, "model_inference/list.html", {"results": results})

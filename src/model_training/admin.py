@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import NeuralNetworkType, TrainedNeuralNetwork
+from .models import SLEAPNeuralNetwork, DLCNeuralNetwork
 
 
-admin.site.register(NeuralNetworkType)
-admin.site.register(TrainedNeuralNetwork)
+admin.site.register(SLEAPNeuralNetwork)
+admin.site.register(DLCNeuralNetwork)

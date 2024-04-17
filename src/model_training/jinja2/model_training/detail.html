@@ -7,32 +7,31 @@
         {{ net.name }}
     </h1>
     <p>
-        Обучение начато: {{ info.started_training_at }}
+        Обучение начато: {{ net.started_training_at }}
     </p>
     <p>
         Обучение окончено: 
-        {% if info.finished_training_at %}
-            {{ info.finished_training_at }}
+        {% if net.finished_training_at %}
+            {{ net.finished_training_at }}
         {% else %}
             ещё не окончено
         {% endif %}
     </p>
     <p>
-        Базовая нейронная сеть: {{ net.neural_network_type.name }}
+        Кодировщик: {{ net.backbone_model }}
     </p>
     <p>
-        Кодировщик: {{ info.backbone_model }}
+        Доля тестовых данных: {{ net.test_fraction }}
     </p>
     <p>
-        Доля тестовых данных: {{ info.test_fraction }}
-    </p>
-    <p>
-        Количество эпох: {{ info.num_epochs }}
+        Количество эпох: {{ net.num_epochs }}
     </p>
     <p>
         Датасет: <a href="{{ url('train_datasets_manager:detail_train_dataset', kwargs={'id': net.train_dataset.pk }) }}">{{ net.train_dataset.name }}</a>
     </p>
 </div>
 
-{% include 'plots/training_stats.html'%}
+{% with neural_network_type='DLC'%}
+    {% include 'plots/training_stats.html'%}
+{% endwith %}
 {% endblock %}

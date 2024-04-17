@@ -15,7 +15,7 @@ def get_uncompleted_analysis_results():
     sleap_ids = []
     dlc_ids = []
     for kps in uncompleted:
-        if kps.trained_neural_network.neural_network_type.name == NeuralNetworkType.SLEAP:
+        if kps.sleap_neural_network:
             sleap_ids.append(kps.results_id)
         else:
             dlc_ids.append(kps.results_id)
@@ -28,7 +28,7 @@ def get_uncompleted_analysis_results():
     if dlc_ids:
         try:
             dlc_response = DLC_MICROSERVICE.send_inference_results_request(dlc_ids)
-            process_video_analysis_results_response(dlc_response, NeuralNetworkType.DeepLabCut)
+            process_video_analysis_results_response(dlc_response, NeuralNetworkType.DLC)
         except ConnectionError as e:
             print(f"Didn't manage to connect to a microservice due to the error: {e}")
 

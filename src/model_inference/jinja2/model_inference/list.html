@@ -12,7 +12,13 @@
     
     {% for res in results %}
     <p>
-        <a href="{{ url('network_inference:detail_inference_results', kwargs={'id':res.pk}) }}">Запуск нейросети "{{res.trained_neural_network.name}}" на видео "{{res.inference_video.name}}" от {{res.started_inference_at}}</a>
+        <a href="{{ url('network_inference:detail_inference_results', kwargs={'id':res.pk}) }}">
+            {% if res.sleap_neural_network %}
+            Запуск нейросети "{{res.sleap_neural_network.name}}" на видео "{{res.inference_video.name}}" от {{res.started_inference_at}}
+            {%else%}
+            Запуск нейросети "{{res.dlc_neural_network.name}}" на видео "{{res.inference_video.name}}" от {{res.started_inference_at}}
+            {% endif%}
+        </a>
     </p>
 
     {% endfor %}

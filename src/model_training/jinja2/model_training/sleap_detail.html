@@ -7,46 +7,44 @@
         {{ net.name }}
     </h1>
     <p>
-        Обучение начато: {{ info.started_training_at }}
+        Обучение начато: {{ net.started_training_at }}
     </p>
     <p>
         Обучение окончено: 
-        {% if info.finished_training_at %}
-            {{ info.finished_training_at }}
+        {% if net.finished_training_at %}
+            {{ net.finished_training_at }}
         {% else %}
             ещё не окончено
         {% endif %}
     </p>
     <p>
-        Базовая нейронная сеть: {{ net.neural_network_type.name }}
+        Кодировщик: {{ net.backbone_model }}
     </p>
+    {% if net.backbone_model == "pretrained_encoder" %}
     <p>
-        Кодировщик: {{ info.backbone_model }}
-    </p>
-    {% if info.backbone_model == "pretrained_encoder" %}
-    <p>
-        Предобученный кодировщик: {{ info.pretrained_encoder }}
+        Предобученный кодировщик: {{ net.pretrained_encoder }}
     </p>
     {% endif %}
     <p>
-        Доля тестовых данных: {{ info.test_fraction }}
+        Доля тестовых данных: {{ net.test_fraction }}
     </p>
     <p>
-        Количество эпох: {{ info.num_epochs }}
+        Количество эпох: {{ net.num_epochs }}
     </p>
     <p>
-        Скорость обучения: {{info.learning_rate}}
+        Скорость обучения: {{net.learning_rate}}
     </p>
     <p>
-        Плотность нормального распределения для выходного слоя: {{ info.heads_sigma }}
+        Плотность нормального распределения для выходного слоя: {{ net.heads_sigma }}
     </p>
     <p>
-        Шаг в выходном слое: {{ info.heads_output_stride }}
+        Шаг в выходном слое: {{ net.heads_output_stride }}
     </p>
     <p>
         Датасет: <a href="{{ url('train_datasets_manager:detail_train_dataset', kwargs={'id': net.train_dataset.pk }) }}">{{ net.train_dataset.name }}</a>
     </p>
 </div>
-
-{% include 'plots/training_stats.html'%}
+{% with neural_network_type='SLEAP'%}
+    {% include 'plots/training_stats.html'%}
+{% endwith %}
 {% endblock %}
