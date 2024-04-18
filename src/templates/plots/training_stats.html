@@ -8,13 +8,14 @@
     let canvasesAndCharts = {};
     function createCanvases(labels) {
         let canvases = {};
+        let allCanvasesContainer = document.getElementById("all-canvases-container");
         for(let label of labels) {
             let canvasContainer = document.createElement("div");
             canvasContainer.style.width = "500px";
             let canvas = document.createElement("canvas");
             canvas.id = label + "_canvas";
             canvasContainer.append(canvas);
-            document.body.append(canvasContainer);
+            allCanvasesContainer.append(canvasContainer);
             let chart = new Chart(canvas.getContext('2d'), {type: 'line', options:{animation: {duration: 0}}});
             canvases[canvas.id] = chart;
         }

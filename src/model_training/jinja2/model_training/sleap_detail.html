@@ -44,6 +44,7 @@
         Датасет: <a href="{{ url('train_datasets_manager:detail_train_dataset', kwargs={'id': net.train_dataset.pk }) }}">{{ net.train_dataset.name }}</a>
     </p>
 </div>
+<div id="all-canvases-container"></div>
 {% with neural_network_type='SLEAP'%}
     {% include 'plots/training_stats.html'%}
 {% endwith %}

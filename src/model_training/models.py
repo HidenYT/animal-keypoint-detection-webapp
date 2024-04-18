@@ -1,5 +1,7 @@
+from abc import ABC, abstractmethod
 from datetime import datetime
 from django.db import models
+from django.urls import reverse
 from train_datasets_manager.models import TrainDataset
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
@@ -16,6 +18,9 @@ class NeuralNetworkType:
     ]
 
 class NeuralNetwork(models.Model):
+    '''Помимо перечисленных полей каждая нейронная сеть также должна обладать полямиЖ
+- train_dataset = models.ForeignKey(TrainDataset, on_delete=models.DO_NOTHING)
+- user = models.ForeignKey(User, on_delete=models.CASCADE)'''
 
     neural_network_type = models.CharField(choices=NeuralNetworkType.ALL_TYPES)
     name = models.CharField(max_length=200)
@@ -27,8 +32,14 @@ class NeuralNetwork(models.Model):
     test_fraction = models.FloatField(validators=[MinValueValidator(0), less_1])
     num_epochs = models.IntegerField(validators=[MinValueValidator(1)])
 
+    train_dataset: models.ForeignKey
+    user: models.ForeignKey
+
     class Meta:
         abstract = True
+    
+    def get_absolute_url(self) -> str:
+        raise NotImplementedError("Abstract method")
 
 class SLEAPNeuralNetwork(NeuralNetwork):
     BACKBONE_MODELS = [
@@ -61,6 +72,9 @@ class SLEAPNeuralNetwork(NeuralNetwork):
     train_dataset = models.ForeignKey(TrainDataset, on_delete=models.DO_NOTHING, related_name='sleap_neural_networks')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sleap_neural_networks')
 
+    def get_absolute_url(self) -> str:
+        return reverse("network_training:detail_trained_network", kwargs={"id": self.pk, "neural_network_type": NeuralNetworkType.SLEAP})
+
 class DLCNeuralNetwork(NeuralNetwork):
     DLC_NET_TYPES = [
         ("resnet_50", "ResNet 50"),
@@ -78,3 +92,6 @@ class DLCNeuralNetwork(NeuralNetwork):
 
     train_dataset = models.ForeignKey(TrainDataset, on_delete=models.DO_NOTHING, related_name='dlc_neural_networks')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='dlc_neural_networks')
+
+    def get_absolute_url(self) -> str:
+        return reverse("network_training:detail_trained_network", kwargs={"id": self.pk, "neural_network_type": NeuralNetworkType.DLC})

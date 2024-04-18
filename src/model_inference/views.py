@@ -1,4 +1,3 @@
-from datetime import datetime
 import json
 from typing import Iterable
 from uuid import UUID
@@ -7,19 +6,21 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from model_inference.forms import RunTrainedNetworkForm
 from model_inference.models import InferredKeypoints
-from model_training.models import DLCNeuralNetwork, NeuralNetworkType, SLEAPNeuralNetwork
+from model_training.models import DLCNeuralNetwork, NeuralNetwork, NeuralNetworkType, SLEAPNeuralNetwork
 from utils.microservices.dlc_microservice import DLC_MICROSERVICE
+from utils.microservices.exceptions import RequestSendingError
+from utils.microservices.microservice import Microservice
 from utils.microservices.sleap_microservice import SLEAP_MICROSERVICE
 from video_manager.models import InferenceVideo
+from requests import ConnectionError
 
 
-@login_required
-def start_dlc_network_inference_view(request: HttpRequest):
+def video_analysis_view(request: HttpRequest, network_class: type[NeuralNetwork], microservice: Microservice):
     form = RunTrainedNetworkForm(request.POST or None)
     form.fields["trained_network"].choices = [
         (net.pk, net.name) 
         for net in 
-        DLCNeuralNetwork.objects.filter(user=request.user)
+        network_class.objects.filter(user=request.user)
     ]
     form.fields["video"].choices = [
         (video.pk, video.name) for video in request.user.inference_videos.all()
@@ -27,7 +28,7 @@ def start_dlc_network_inference_view(request: HttpRequest):
     if request.method == "POST":
         if form.is_valid():
             model = get_object_or_404(
-                DLCNeuralNetwork, 
+                network_class, 
                 user=request.user, 
                 pk=form.cleaned_data['trained_network']
             )
@@ -36,60 +37,35 @@ def start_dlc_network_inference_view(request: HttpRequest):
                 user=request.user, 
                 pk=form.cleaned_data['video']
             )
-            response = DLC_MICROSERVICE.send_video_inference_request(
-                video.file.path,
-                UUID(model.model_uid),
-            )
-            if response.status_code == 200:
-                response = response.json()
-                kps = InferredKeypoints.objects.create(
-                    results_id=response["results_id"],
-                    dlc_neural_network=model,
-                    user=request.user,
-                    inference_video=video,
+            try:
+                response = microservice.send_video_inference_request(
+                    video.file.path,
+                    UUID(model.model_uid),
                 )
-                return redirect('network_inference:detail_inference_results', id=kps.pk)
-            raise Exception("Response didn't return 200 status code: %s" % response.content.decode())
+                if response.status_code == 200:
+                    response = response.json()
+                    kps = InferredKeypoints.objects.create(
+                        results_id=response["results_id"],
+                        dlc_neural_network=model,
+                        user=request.user,
+                        inference_video=video,
+                    )
+                    return redirect('network_inference:detail_inference_results', id=kps.pk)
+                raise RequestSendingError(f"Response didn't return error code 200. Response: {response.text}")
+            except ConnectionError:
+                print(f"Can't connect to the {microservice.__class__.__name__} microservice")
+            except Exception as e:
+                print(e)
+            form.add_error(None, "Something went wrong when sending request to analyze video. Try again later.")
     return render(request, "model_inference/run_network.html", {"form": form})
 
 @login_required
+def start_dlc_network_inference_view(request: HttpRequest):
+    return video_analysis_view(request, DLCNeuralNetwork, DLC_MICROSERVICE)
+
+@login_required
 def start_sleap_network_inference_view(request: HttpRequest):
-    form = RunTrainedNetworkForm(request.POST or None)
-    form.fields["trained_network"].choices = [
-        (net.pk, net.name) 
-        for net in 
-        SLEAPNeuralNetwork.objects.filter(user=request.user)
-    ]
-    form.fields["video"].choices = [
-        (video.pk, video.name) for video in request.user.inference_videos.all()
-    ]
-    if request.method == "POST":
-        if form.is_valid():
-            net = get_object_or_404(
-                SLEAPNeuralNetwork, 
-                user=request.user, 
-                pk=form.cleaned_data['trained_network'],
-            )
-            video = get_object_or_404(
-                InferenceVideo, 
-                user=request.user, 
-                pk=form.cleaned_data['video']
-            )
-            response = SLEAP_MICROSERVICE.send_video_inference_request(
-                video.file.path,
-                UUID(net.model_uid)
-            )
-            if response.status_code == 200:
-                response = response.json()
-                kps = InferredKeypoints.objects.create(
-                    results_id=response["results_id"],
-                    sleap_neural_network=net,
-                    user=request.user,
-                    inference_video=video,
-                )
-                return redirect('network_inference:detail_inference_results', id=kps.pk)
-            raise Exception("Response didn't return 200 status code: %s" % response.content.decode())
-    return render(request, "model_inference/run_network.html", {"form": form})
+    return video_analysis_view(request, SLEAPNeuralNetwork, SLEAP_MICROSERVICE)
 
 @login_required
 def detail_inference_results_view(request: HttpRequest, id: int):

@@ -1,8 +1,6 @@
-from typing import Generic, TypeVar
 from django import forms
 
 from model_training.models import DLCNeuralNetwork, SLEAPNeuralNetwork
-from utils.validators import greater_0, less_1
 
 EXCLUDE_FIELDS = [
     'user', 

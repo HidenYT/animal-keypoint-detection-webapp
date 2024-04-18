@@ -3,24 +3,26 @@
 {% block title %}Результаты запусков{% endblock %}
 {% block content %}
 <div>
-    <p>
-        <a href="{{ url('network_inference:start_dlc_network_inference') }}">Выбрать и запустить DLS</a>
-    </p>
-    <p>
-        <a href="{{ url('network_inference:start_sleap_network_inference') }}">Выбрать и запустить SLEAP</a>
-    </p>
-    
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url('network_inference:start_dlc_network_inference') }}">Выбрать и запустить DLC</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url('network_inference:start_sleap_network_inference') }}">Выбрать и запустить SLEAP</a>
+        </li>
+    </ul>
+    <h3>Результаты:</h3>
+    <ul class="list-group list-group-flush">
     {% for res in results %}
-    <p>
-        <a href="{{ url('network_inference:detail_inference_results', kwargs={'id':res.pk}) }}">
+        <a class="list-group-item" href="{{ url('network_inference:detail_inference_results', kwargs={'id':res.pk}) }}">
             {% if res.sleap_neural_network %}
             Запуск нейросети "{{res.sleap_neural_network.name}}" на видео "{{res.inference_video.name}}" от {{res.started_inference_at}}
             {%else%}
             Запуск нейросети "{{res.dlc_neural_network.name}}" на видео "{{res.inference_video.name}}" от {{res.started_inference_at}}
             {% endif%}
         </a>
-    </p>
 
     {% endfor %}
+    </ul>
 </div>
 {% endblock %}
