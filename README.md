@@ -92,6 +92,8 @@ poetry run python manage.py runserver
 poetry run celery -A core.celery:app worker -l INFO -P threads
 poetry run celery -A core.celery:app beat
 ```
+
+После этого приложение станет доступно в браузере по адресу `http://127.0.0.1:8000/`
 </details>
 
 ## Шаг №2 - Запуск микросервисов
