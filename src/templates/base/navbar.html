@@ -6,28 +6,35 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url('index') }}">Главная</a>
-          </li>
           {% if not request.user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url('auth:login') }}">Войти</a>
+            <a class="nav-link {% if request.resolver_match.view_name == 'auth:login' %}active{% endif %}" aria-current="page" href="{{ url('auth:login') }}">Войти</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url('auth:register') }}">Зарегистрироваться</a>
+            <a class="nav-link {% if request.resolver_match.view_name == 'auth:register' %}active{% endif %}" aria-current="page" href="{{ url('auth:register') }}">Зарегистрироваться</a>
           </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url('train_datasets_manager:list_train_datasets') }}">Датасеты</a>
+            <a class="nav-link {% if request.resolver_match.view_name == 'train_datasets_manager:list_train_datasets' %}active{% endif %}" aria-current="page" href="{{ url('train_datasets_manager:list_train_datasets') }}">Датасеты</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url('video_manager:list_inference_videos') }}">Видео</a>
+            <a class="nav-link {% if request.resolver_match.view_name == 'video_manager:list_inference_videos' %}active{% endif %}" aria-current="page" href="{{ url('video_manager:list_inference_videos') }}">Видео</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url('network_training:list_trained_networks') }}">Обучение</a>
+          <li class="nav-item dropdown" onmouseover="onMouseOverNavbarDropdownItem(this)" onmouseleave="onMouseLeaveNavbarDropdownItem(this)">
+            <a href="{{ url('network_training:list_trained_networks') }}" class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'network_training' %}active{% endif %}" role="button">Обучение</a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item {% if request.resolver_match.view_name == 'network_training:list_trained_networks' %}active{% endif %}" href="{{ url('network_training:list_trained_networks') }}">Нейросети</a>
+              <a class="dropdown-item {% if request.resolver_match.view_name == 'network_training:start_dlc_network_training' %}active{% endif %}" href="{{ url('network_training:start_dlc_network_training') }}">Обучить DeepLabCut</a>
+              <a class="dropdown-item {% if request.resolver_match.view_name == 'network_training:start_sleap_network_training' %}active{% endif %}" href="{{ url('network_training:start_sleap_network_training') }}">Обучить SLEAP</a>
+            </div>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url('network_inference:list_inference_results') }}">Анализ видео</a>
+          <li class="nav-item dropdown" onmouseover="onMouseOverNavbarDropdownItem(this)" onmouseleave="onMouseLeaveNavbarDropdownItem(this)">
+            <a href="{{ url('network_inference:list_inference_results') }}" class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'network_inference' %}active{% endif %}" role="button" >Анализ видео</a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item {% if request.resolver_match.view_name == 'network_inference:list_inference_results' %}active{% endif %}" href="{{ url('network_inference:list_inference_results') }}">Результаты</a>
+              <a class="dropdown-item {% if request.resolver_match.view_name == 'network_inference:start_dlc_network_inference' %}active{% endif %}" href="{{ url('network_inference:start_dlc_network_inference') }}">Анализ с DeepLabCut</a>
+              <a class="dropdown-item {% if request.resolver_match.view_name == 'network_inference:start_sleap_network_inference' %}active{% endif %}" href="{{ url('network_inference:start_sleap_network_inference') }}">Анализ с SLEAP</a>
+            </div>
           </li>
           <li class="nav-item">
             <a class="nav-link" aria-current="page" href="{{ url('auth:logout') }}">Выйти</a>

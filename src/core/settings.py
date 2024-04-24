@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -166,21 +166,11 @@ SENDFILE_BACKEND = "django_sendfile.backends.development"
 
 SENDFILE_ROOT = MEDIA_ROOT
 
-# Neural networks training
-
-TRAINING_DIR_PATH = MEDIA_ROOT / "network_training"
-
-DLC_PROJECTS_DIR_PATH = TRAINING_DIR_PATH / "deep_lab_cut_projects"
-
-DUMMY_VIDEO_NAME = "dummy.mp4"
-
-DUMMY_VIDEO_PATH = DLC_PROJECTS_DIR_PATH / DUMMY_VIDEO_NAME
-
 # Neural networks inference
 
 INFERENCE_RESULTS_DIR_PATH = MEDIA_ROOT / "network_inference"
 
-DLC_INFERENCE_DIR_PATH = INFERENCE_RESULTS_DIR_PATH / "deep_lab_cut"
+LABELED_VIDEOS_DIR_PATH = INFERENCE_RESULTS_DIR_PATH / "labeled_videos"
 
 # Celery
 

@@ -3,10 +3,11 @@
 {% block title %} Видео {%endblock%}
 
 {% block content %}
+<h1>Видео</h1>
 <a class="btn btn-primary" href="{{ url('video_manager:upload_inference_video') }}">Загрузить</a>
 <ul class="list-group list-group-flush">
     {% for video in videos %}
-    <a class="list-group-item" href="{{video.get_absolute_url()}}">{{video.name}}</a>
+    <a class="list-group-item list-group-item-action" href="{{video.get_absolute_url()}}">{{video.name}}</a>
     {% endfor %}
 </ul>
 {% endblock %}

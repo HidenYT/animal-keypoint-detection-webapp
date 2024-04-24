@@ -3,9 +3,10 @@
 {% block title %} Наборы данных для обучения {%endblock%}
 
 {% block content %}
+<h1>Датасеты</h1>
 <a class="btn btn-primary" href="{{ url('train_datasets_manager:upload_train_dataset') }}">Загрузить</a>
     <ul class="list-group list-group-flush">
     {% for dataset in datasets %}
-    <a class="list-group-item" href="{{dataset.get_absolute_url()}}">{{dataset.name}}</a>
+    <a class="list-group-item list-group-item-action" href="{{dataset.get_absolute_url()}}">{{dataset.name}}</a>
     {% endfor %}
 {% endblock %}

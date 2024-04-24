@@ -1,28 +1,48 @@
 {% extends "base/base.html" %}
 
-{% block title %}Результаты запусков{% endblock %}
+{% block title %}Результаты анализа{% endblock %}
 {% block content %}
 <div>
-    <ul class="nav">
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('network_inference:start_dlc_network_inference') }}">Выбрать и запустить DLC</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('network_inference:start_sleap_network_inference') }}">Выбрать и запустить SLEAP</a>
-        </li>
-    </ul>
-    <h3>Результаты:</h3>
-    <ul class="list-group list-group-flush">
-    {% for res in results %}
-        <a class="list-group-item" href="{{ url('network_inference:detail_inference_results', kwargs={'id':res.pk}) }}">
-            {% if res.sleap_neural_network %}
-            Запуск нейросети "{{res.sleap_neural_network.name}}" на видео "{{res.inference_video.name}}" от {{res.started_inference_at}}
-            {%else%}
-            Запуск нейросети "{{res.dlc_neural_network.name}}" на видео "{{res.inference_video.name}}" от {{res.started_inference_at}}
-            {% endif%}
-        </a>
+    <h1>Результаты анализа</h1>
+    <div class="container list-group list-group-flush">
+        <div class="list-group-item">
+          <div class="row p-1">
+            <div class="col fw-bold">Видео</div>
+            <div class="col fw-bold">Нейросеть</div>
+            <div class="col fw-bold">Начало анализа</div>
+            <div class="col fw-bold">Окончание анализа</div>
+          </div>
+        </div>
+        {% for res in results %}
+            <a class="list-group-item list-group-item-action" href="{{ url('network_inference:detail_inference_results', kwargs={'id':res.pk}) }}">
+                <div class="row p-1">
+                    <div class="col">{{res.inference_video.name}}</div>
+                    <div class="col">
+                    {% if res.sleap_neural_network %}
+                    {{res.sleap_neural_network.name}}
+                    {%else%}
+                    {{res.dlc_neural_network.name}}
+                    {% endif%}
+                    </div>
+                    <div class="col">
+                    {% if res.started_inference_at %}
+                        {{res.started_inference_at.strftime("%d/%m/%Y %H:%M")}}
+                    {% else %}
+                        Не начат
+                    {% endif %}
+                    </div>
+                    <div class="col">
+                    {% if res.finished_inference_at %}
+                        {{res.finished_inference_at.strftime("%d/%m/%Y %H:%M")}}
+                    {% else %}
+                        Не окончен
+                    {% endif %}
+                    </div>
+                </div>
+                
+            </a>
 
-    {% endfor %}
+        {% endfor %}
     </ul>
 </div>
 {% endblock %}

@@ -4,8 +4,10 @@ from uuid import UUID
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from model_inference.forms import RunTrainedNetworkForm
 from model_inference.models import InferredKeypoints
+from model_inference.tasks import generate_labeled_video_from_analysis_results
 from model_training.models import DLCNeuralNetwork, NeuralNetwork, NeuralNetworkType, SLEAPNeuralNetwork
 from utils.microservices.dlc_microservice import DLC_MICROSERVICE
 from utils.microservices.exceptions import RequestSendingError
@@ -82,7 +84,7 @@ def detail_inference_results_view(request: HttpRequest, id: int):
 
 @login_required
 def download_inference_results_view(request: HttpRequest, id: int):
-    results = get_object_or_404(InferredKeypoints, id=id, user=request.user, keypoints__isnull=False)
+    results = get_object_or_404(InferredKeypoints, pk=id, user=request.user, keypoints__isnull=False)
     response = HttpResponse(json.dumps(results.keypoints), content_type="application/json")
     response['Content-Disposition'] = 'attachment; filename=' + f"Inference results {id}.json"
     return response
@@ -91,3 +93,9 @@ def download_inference_results_view(request: HttpRequest, id: int):
 def list_inference_results_view(request: HttpRequest):
     results: Iterable[InferredKeypoints] = request.user.inferred_keypoints_set.order_by("-started_inference_at").all()
     return render(request, "model_inference/list.html", {"results": results})
+
+@login_required
+def run_labeled_video_generation_view(request: HttpRequest, id: int):
+    get_object_or_404(InferredKeypoints, pk=id, user=request.user, keypoints__isnull=False)
+    generate_labeled_video_from_analysis_results.delay(id)
+    return redirect("network_inference:detail_inference_results", id=id)

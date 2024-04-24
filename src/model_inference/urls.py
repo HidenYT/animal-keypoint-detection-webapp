@@ -5,6 +5,7 @@ from .views import (
     list_inference_results_view,
     start_sleap_network_inference_view,
     download_inference_results_view,
+    run_labeled_video_generation_view,
 )
 
 
@@ -16,4 +17,5 @@ urlpatterns = [
     path("<int:id>", detail_inference_results_view, name="detail_inference_results"),
     path("", list_inference_results_view, name="list_inference_results"),
     path("<int:id>/download", download_inference_results_view, name="download_inference_results"),
+    path("<int:id>/generate-labeled-video", run_labeled_video_generation_view, name="run_labeled_video_generation"),
 ]

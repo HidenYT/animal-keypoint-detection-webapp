@@ -3,21 +3,42 @@
 {% block title %}Обучение{% endblock %}
 {% block content %}
 <div>
-    <ul class="nav">
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url('network_training:start_dlc_network_training') }}">Обучить DLC</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url('network_training:start_sleap_network_training') }}">Обучить SLEAP</a>
-        </li>
-    </ul>
-    <h3>Нейросети:</h3>
-    <ul class="list-group list-group-flush">
-    {% for net in networks %}
-    <a class="list-group-item" href="{{net.get_absolute_url()}}">
-        {{ net.name }}
-    </a>
-    {% endfor %}
-    </ul>
+    <h1>Нейросети</h1>
+    <div class="container list-group list-group-flush">
+      <div class="list-group-item">
+        <div class="row p-1">
+          <div class="col fw-bold">Название</div>
+          <div class="col fw-bold">Тип</div>
+          <div class="col fw-bold">Доля тестовых данных</div>
+          <div class="col fw-bold">Эпохи</div>
+          <div class="col fw-bold">Начало обучения</div>
+          <div class="col fw-bold">Окончание обучения</div>
+        </div>
+      </div>
+      {% for net in networks %}
+      <a class="list-group-item list-group-item-action" href="{{net.get_absolute_url()}}">
+        <div class="row p-1">
+            <div class="col fw-bold">{{ net.name }}</div>
+            <div class="col">{{net.neural_network_type}}</div>
+            <div class="col">{{net.test_fraction}}</div>
+            <div class="col">{{net.num_epochs}}</div>
+            <div class="col">
+            {% if net.started_training_at %}
+              {{net.started_training_at.strftime("%d/%m/%Y %H:%M")}}
+            {% else %}
+              Не начато
+            {% endif %}
+            </div>
+            <div class="col">
+            {% if net.finished_training_at %}
+              {{net.finished_training_at.strftime("%d/%m/%Y %H:%M")}}
+            {% else %}
+              Не окончено
+            {%endif%}
+            </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
 </div>
 {% endblock %}

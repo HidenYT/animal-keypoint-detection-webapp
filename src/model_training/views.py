@@ -72,7 +72,6 @@ def get_model_training_stats(request: HttpRequest, neural_network_type: str, mod
 
 @login_required
 def detail_trained_network_view(request: HttpRequest, neural_network_type: str, id: int):
-    nn_cls = None
     if neural_network_type == NeuralNetworkType.SLEAP:
         nn_cls = SLEAPNeuralNetwork
     elif neural_network_type == NeuralNetworkType.DLC:
@@ -91,3 +90,17 @@ def list_trained_networks_view(request: HttpRequest):
     dlc_networks = list(DLCNeuralNetwork.objects.filter(user=request.user))
     networks = sorted(sleap_networks + dlc_networks, key=lambda x: x.started_training_at, reverse=True)
     return render(request, "model_training/list.html", {"networks": networks})
+
+@login_required
+def delete_trained_network_view(request: HttpRequest, neural_network_type: str, id: int):
+    if neural_network_type == NeuralNetworkType.SLEAP:
+        nn_cls = SLEAPNeuralNetwork
+    elif neural_network_type == NeuralNetworkType.DLC:
+        nn_cls = DLCNeuralNetwork
+    else:
+        return HttpResponseNotFound(f"No neural network type {neural_network_type}")
+    network = get_object_or_404(nn_cls, pk=id, user=request.user)
+    if request.method == "POST":
+        network.delete()
+        return redirect("network_training:list_trained_networks")
+    return render(request, "model_training/delete.html", {"net": network})

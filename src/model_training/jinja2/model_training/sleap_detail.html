@@ -43,6 +43,7 @@
     <p>
         Датасет: <a href="{{ url('train_datasets_manager:detail_train_dataset', kwargs={'id': net.train_dataset.pk }) }}">{{ net.train_dataset.name }}</a>
     </p>
+    <a href="{{ url('network_training:delete_trained_network', kwargs={'neural_network_type': 'SLEAP', 'id': net.pk})}}">Удалить</a>
 </div>
 <div id="all-canvases-container"></div>
 {% with neural_network_type='SLEAP'%}

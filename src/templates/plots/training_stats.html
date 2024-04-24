@@ -22,7 +22,7 @@
         return canvases;
     }
     function getTrainingStats() {
-        fetch("http://127.0.0.1:8000/network-training/training-stats/{{neural_network_type}}/{{net.pk}}").then((res) => {
+        fetch("http://{{request.get_host()}}/network-training/training-stats/{{neural_network_type}}/{{net.pk}}").then((res) => {
             return res.json();
         }).then(
             (json) => {
