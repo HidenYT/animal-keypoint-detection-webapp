@@ -9,6 +9,7 @@ from model_inference.forms import RunTrainedNetworkForm
 from model_inference.models import InferredKeypoints
 from model_inference.tasks import generate_labeled_video_from_analysis_results
 from model_training.models import DLCNeuralNetwork, NeuralNetwork, NeuralNetworkType, SLEAPNeuralNetwork
+from utils.list_sort import get_sorted_objects
 from utils.microservices.dlc_microservice import DLC_MICROSERVICE
 from utils.microservices.exceptions import RequestSendingError
 from utils.microservices.microservice import Microservice
@@ -91,8 +92,12 @@ def download_inference_results_view(request: HttpRequest, id: int):
 
 @login_required
 def list_inference_results_view(request: HttpRequest):
-    results: Iterable[InferredKeypoints] = request.user.inferred_keypoints_set.order_by("-started_inference_at").all()
-    return render(request, "model_inference/list.html", {"results": results})
+    results: Iterable[InferredKeypoints] = list(request.user.inferred_keypoints_set.all())
+    order_results_by = request.GET.get("order-results-by", "-started_inference_at")
+    if order_results_by not in InferredKeypoints.ORDER_BY_OPTIONS:
+        order_results_by = '-started_inference_at'
+    analysis_results = get_sorted_objects(order_results_by, results)
+    return render(request, "model_inference/list.html", {"analysis_results": analysis_results})
 
 @login_required
 def run_labeled_video_generation_view(request: HttpRequest, id: int):

@@ -10,6 +10,13 @@ def inference_video_upload_path(instance: "InferenceVideo", filename: str) -> st
     return default_upload_path(settings.INFERENCE_VIDEO_UPLOAD_DIR, instance.user, filename)
 
 class InferenceVideo(models.Model):
+    ORDER_BY_OPTIONS = [
+        'name',
+        'created_at',
+        'updated_at'
+    ]
+    ORDER_BY_OPTIONS += [f"-{opt}" for opt in ORDER_BY_OPTIONS]
+
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
 

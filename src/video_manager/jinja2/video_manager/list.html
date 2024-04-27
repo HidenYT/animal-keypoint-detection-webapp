@@ -3,11 +3,22 @@
 {% block title %} Видео {%endblock%}
 
 {% block content %}
-<h1>Видео</h1>
-<a class="btn btn-primary" href="{{ url('video_manager:upload_inference_video') }}">Загрузить</a>
-<ul class="list-group list-group-flush">
+<div class="list-group list-group-flush">
+    <div class="list-group-item">
+        <div class="row p-1">
+          <div class="col fw-bold" role="button" onclick="onSortVideosByFieldClickListener('name')">Название</div>
+          <div class="col fw-bold" role="button" onclick="onSortVideosByFieldClickListener('created_at')">Загружено</div>
+          <div class="col fw-bold" role="button" onclick="onSortVideosByFieldClickListener('updated_at')">Обновлено</div>
+        </div>
+    </div>
     {% for video in videos %}
-    <a class="list-group-item list-group-item-action" href="{{video.get_absolute_url()}}">{{video.name}}</a>
+    <a class="list-group-item list-group-item-action" href="{{video.get_absolute_url()}}">
+        <div class="row p-1">
+            <div class="col fw-bold">{{ video.name }}</div>
+            <div class="col">{{video.created_at.strftime("%d/%m/%Y %H:%M")}}</div>
+            <div class="col">{{video.updated_at.strftime("%d/%m/%Y %H:%M")}}</div>
+        </div>
+    </a>
     {% endfor %}
-</ul>
+</div>
 {% endblock %}

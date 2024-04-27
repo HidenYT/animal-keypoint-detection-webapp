@@ -4,9 +4,11 @@ from django.http import HttpRequest, HttpResponseNotFound, HttpResponseServerErr
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from requests import ConnectionError
+from model_inference.models import InferredKeypoints
 from model_training.error_responses import JSONHttpErrorResponse
 from model_training.models import NeuralNetwork, NeuralNetworkType, SLEAPNeuralNetwork, DLCNeuralNetwork
 from train_datasets_manager.models import TrainDataset
+from utils.list_sort import get_sorted_objects
 from utils.microservices.dlc_microservice import DLC_MICROSERVICE
 from utils.microservices.exceptions import RequestSendingError
 from utils.microservices.microservice import Microservice
@@ -88,7 +90,13 @@ def detail_trained_network_view(request: HttpRequest, neural_network_type: str, 
 def list_trained_networks_view(request: HttpRequest):
     sleap_networks = list(SLEAPNeuralNetwork.objects.filter(user=request.user))
     dlc_networks = list(DLCNeuralNetwork.objects.filter(user=request.user))
-    networks = sorted(sleap_networks + dlc_networks, key=lambda x: x.started_training_at, reverse=True)
+    order_networks_by = request.GET.get("order-nets-by", "-started_training_at")
+    if order_networks_by not in NeuralNetwork.ORDER_BY_OPTIONS:
+        order_networks_by = '-started_training_at'
+    networks = get_sorted_objects(order_networks_by, 
+                                   sleap_networks + 
+                                   dlc_networks
+                                   )
     return render(request, "model_training/list.html", {"networks": networks})
 
 @login_required
@@ -103,4 +111,9 @@ def delete_trained_network_view(request: HttpRequest, neural_network_type: str, 
     if request.method == "POST":
         network.delete()
         return redirect("network_training:list_trained_networks")
-    return render(request, "model_training/delete.html", {"net": network})
+    
+    order_results_by = request.GET.get("order-results-by", "-started_inference_at")
+    if order_results_by not in InferredKeypoints.ORDER_BY_OPTIONS:
+        order_results_by = '-started_inference_at'
+    analysis_results = get_sorted_objects(order_results_by, network.inferred_keypoints_set.all())
+    return render(request, "model_training/delete.html", {"net": network, "analysis_results": analysis_results})

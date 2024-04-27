@@ -7,12 +7,12 @@
         Результаты для видео "{{ kps.inference_video.name }}" нейросети "{{net.name}}"
     </h1>
     <p>
-        Работа начата: {{ kps.started_inference_at }}
+        Работа начата: {{ kps.started_inference_at.strftime("%d/%m/%Y %H:%M") }}
     </p>
     <p>
         Работа окончена: 
         {% if kps.finished_inference_at %}
-            {{ kps.finished_inference_at }}
+            {{ kps.finished_inference_at.strftime("%d/%m/%Y %H:%M") }}
         {% else %}
             ещё не окончена
         {% endif %}

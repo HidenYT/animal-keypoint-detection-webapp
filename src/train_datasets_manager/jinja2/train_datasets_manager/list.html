@@ -3,10 +3,22 @@
 {% block title %} Наборы данных для обучения {%endblock%}
 
 {% block content %}
-<h1>Датасеты</h1>
-<a class="btn btn-primary" href="{{ url('train_datasets_manager:upload_train_dataset') }}">Загрузить</a>
-    <ul class="list-group list-group-flush">
+<div class="list-group list-group-flush">
+    <div class="list-group-item">
+        <div class="row p-1">
+          <div class="col fw-bold" role="button" onclick="onSortDatasetsByFieldClickListener('name')">Название</div>
+          <div class="col fw-bold" role="button" onclick="onSortDatasetsByFieldClickListener('created_at')">Загружено</div>
+          <div class="col fw-bold" role="button" onclick="onSortDatasetsByFieldClickListener('updated_at')">Обновлено</div>
+        </div>
+    </div>
     {% for dataset in datasets %}
-    <a class="list-group-item list-group-item-action" href="{{dataset.get_absolute_url()}}">{{dataset.name}}</a>
+    <a class="list-group-item list-group-item-action" href="{{dataset.get_absolute_url()}}">
+        <div class="row p-1">
+            <div class="col fw-bold">{{ dataset.name }}</div>
+            <div class="col">{{dataset.created_at.strftime("%d/%m/%Y %H:%M")}}</div>
+            <div class="col">{{dataset.updated_at.strftime("%d/%m/%Y %H:%M")}}</div>
+        </div>
+    </a>
     {% endfor %}
+</div>
 {% endblock %}

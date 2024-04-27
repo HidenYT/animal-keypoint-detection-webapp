@@ -2,14 +2,16 @@
 
 {% block title %}Удаление нейросети "{{ net.name }}"{% endblock %}
 {% block content %}
-<h1>Удаление нейросети "{{ net.name }}"</h1>
-<p>
-    Вы уверены, что хотите удалить нейросеть "<a href={{net.get_absolute_url()}}>{{ net.name }}</a>"?
-    Это действие будет невозможно отменить!
-</p>
-<a href="{{ url('network_training:list_trained_networks') }}">Назад</a>
+<h2>
+    Вы действительно хотите удалить нейросеть "<a href={{net.get_absolute_url()}}>{{ net.name }}</a>"?
+</h2>
+<div class="list-group mb-3">
+    {% include 'model_inference/list_results_frame.html'%}
+</div>
+
 <form method="POST">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    <button type="submit">Удалить</button>
+    <a href="{{ net.get_absolute_url() }}" class="btn btn-primary">Назад</a>
+    <button type="submit" class="btn btn-danger">Удалить</button>
 </form>
 {% endblock %}

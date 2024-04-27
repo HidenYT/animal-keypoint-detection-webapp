@@ -7,12 +7,12 @@
         {{ net.name }}
     </h1>
     <p>
-        Обучение начато: {{ net.started_training_at }}
+        Обучение начато: {{ net.started_training_at.strftime("%d/%m/%Y %H:%M") }}
     </p>
     <p>
         Обучение окончено: 
         {% if net.finished_training_at %}
-            {{ net.finished_training_at }}
+            {{ net.finished_training_at.strftime("%d/%m/%Y %H:%M") }}
         {% else %}
             ещё не окончено
         {% endif %}

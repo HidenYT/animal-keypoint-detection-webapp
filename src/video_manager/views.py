@@ -6,6 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django_sendfile import sendfile
 from django.urls import reverse
 
+from model_inference.models import InferredKeypoints
+from utils.list_sort import get_sorted_objects
+
 from .forms import VideoEditForm, VideoUploadForm
 from .models import InferenceVideo
 
@@ -16,6 +19,10 @@ def get_video(request: HttpRequest, id: int):
 @login_required
 def list_inference_videos_view(request: HttpRequest):
     videos = InferenceVideo.objects.filter(user=request.user)
+    order_videos_by = request.GET.get("order-videos-by", "-created_at")
+    if order_videos_by not in InferenceVideo.ORDER_BY_OPTIONS:
+        order_videos_by = '-created_at'
+    videos = get_sorted_objects(order_videos_by, list(videos))
     ctx = {
         "videos": videos,
     }
@@ -61,7 +68,11 @@ def delete_inference_video_view(request: HttpRequest, id: int):
     if request.method == "POST":
         video.delete()
         return redirect(reverse("video_manager:list_inference_videos"))
-    return render(request, "video_manager/delete.html", {"video": video})
+    order_results_by = request.GET.get("order-results-by", "-started_inference_at")
+    if order_results_by not in InferredKeypoints.ORDER_BY_OPTIONS:
+        order_results_by = '-started_inference_at'
+    analysis_results = get_sorted_objects(order_results_by, video.inferred_keypoints_set.all())
+    return render(request, "video_manager/delete.html", {"video": video, "analysis_results": analysis_results})
 
 @login_required
 def inference_video_data_view(request: HttpRequest, id: int):

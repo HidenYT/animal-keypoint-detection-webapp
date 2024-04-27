@@ -1,10 +1,15 @@
 from datetime import datetime
 import os
+from amqp import NotFound
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django_sendfile import sendfile
 from django.urls import reverse
+
+from model_inference.models import InferredKeypoints
+from model_training.models import NeuralNetwork
+from utils.list_sort import get_sorted_objects
 
 from .forms import DatasetEditForm, DatasetUploadForm
 from .models import TrainDataset
@@ -15,6 +20,10 @@ def get_dataset(request: HttpRequest, id: int) -> TrainDataset:
 @login_required
 def list_train_datasets_view(request: HttpRequest):
     datasets = TrainDataset.objects.filter(user=request.user)
+    order_datasets_by = request.GET.get("order-datasets-by", "-created_at")
+    if order_datasets_by not in TrainDataset.ORDER_BY_OPTIONS:
+        order_datasets_by = '-created_at'
+    datasets = get_sorted_objects(order_datasets_by, list(datasets))
     ctx = {
         "datasets": datasets,
     }
@@ -60,7 +69,25 @@ def delete_train_dataset_view(request: HttpRequest, id: int):
     if request.method == 'POST':
         dataset.delete()
         return redirect(reverse("train_datasets_manager:list_train_datasets"))
-    return render(request, "train_datasets_manager/delete.html", {"dataset": dataset})
+    order_networks_by = request.GET.get("order-nets-by", "-started_training_at")
+    if order_networks_by not in NeuralNetwork.ORDER_BY_OPTIONS:
+        order_networks_by = '-started_training_at'
+    order_results_by = request.GET.get("order-results-by", "-started_inference_at")
+    if order_results_by not in InferredKeypoints.ORDER_BY_OPTIONS:
+        order_results_by = '-started_inference_at'
+    networks = get_sorted_objects(order_networks_by, 
+                                   list(dataset.sleap_neural_networks.all()) + 
+                                   list(dataset.dlc_neural_networks.all())
+                                   )
+    analysis_results = get_sorted_objects(order_results_by,
+            [res for net in networks for res in net.inferred_keypoints_set.all()]                   
+    )
+    ctx = {
+        "dataset": dataset,
+        "networks": networks,
+        'analysis_results': analysis_results,
+    }
+    return render(request, "train_datasets_manager/delete.html", ctx)
 
 @login_required
 def train_dataset_data_view(request: HttpRequest, id: int):

@@ -14,11 +14,19 @@
             <a class="nav-link {% if request.resolver_match.view_name == 'auth:register' %}active{% endif %}" aria-current="page" href="{{ url('auth:register') }}">Зарегистрироваться</a>
           </li>
           {% else %}
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.view_name == 'train_datasets_manager:list_train_datasets' %}active{% endif %}" aria-current="page" href="{{ url('train_datasets_manager:list_train_datasets') }}">Датасеты</a>
+          <li class="nav-item dropdown" onmouseover="onMouseOverNavbarDropdownItem(this)" onmouseleave="onMouseLeaveNavbarDropdownItem(this)">
+            <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'train_datasets_manager' %}active{% endif %}" aria-current="page" role="button" href="{{ url('train_datasets_manager:list_train_datasets') }}">Датасеты</a>
+            <div class="dropdown-menu">
+              <a href="{{ url('train_datasets_manager:list_train_datasets') }}" class="dropdown-item {% if request.resolver_match.view_name == 'train_datasets_manager:list_train_datasets' %}active{% endif %}">Список</a>
+              <a href="{{url('train_datasets_manager:upload_train_dataset')}}" class="dropdown-item {% if request.resolver_match.view_name == 'train_datasets_manager:upload_train_dataset' %}active{% endif %}">Загрузить</a>
+            </div>
           </li>
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.view_name == 'video_manager:list_inference_videos' %}active{% endif %}" aria-current="page" href="{{ url('video_manager:list_inference_videos') }}">Видео</a>
+          <li class="nav-item dropdown" onmouseover="onMouseOverNavbarDropdownItem(this)" onmouseleave="onMouseLeaveNavbarDropdownItem(this)">
+            <a class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'video_manager' %}active{% endif %}" aria-current="page" role="button" href="{{ url('video_manager:list_inference_videos') }}">Видео</a>
+            <div class="dropdown-menu">
+              <a href="{{ url('video_manager:list_inference_videos') }}" class="dropdown-item {% if request.resolver_match.view_name == 'video_manager:list_inference_videos' %}active{% endif %}">Список</a>
+              <a href="{{url('video_manager:upload_inference_video')}}" class="dropdown-item {% if request.resolver_match.view_name == 'video_manager:upload_inference_video' %}active{% endif %}">Загрузить</a>
+            </div>
           </li>
           <li class="nav-item dropdown" onmouseover="onMouseOverNavbarDropdownItem(this)" onmouseleave="onMouseLeaveNavbarDropdownItem(this)">
             <a href="{{ url('network_training:list_trained_networks') }}" class="nav-link dropdown-toggle {% if request.resolver_match.app_name == 'network_training' %}active{% endif %}" role="button">Обучение</a>

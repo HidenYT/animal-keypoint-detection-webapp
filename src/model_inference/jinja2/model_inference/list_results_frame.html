@@ -1,0 +1,36 @@
+<div class="list-group-item">
+    <div class="row p-1">
+      <div class="col fw-bold">Видео</div>
+      <div class="col fw-bold">Нейросеть</div>
+      <div class="col fw-bold" role="button" onclick="onSortAnalysisByStartedInferenceAtClickListener()">Начало анализа</div>
+      <div class="col fw-bold" role="button" onclick="onSortAnalysisByFinishedInferenceAtClickListener()">Окончание анализа</div>
+    </div>
+</div>
+{% for res in analysis_results %}
+<a class="list-group-item list-group-item-action" href="{{res.get_absolute_url()}}">
+    <div class="row p-1">
+          <div class="col">{{res.inference_video.name}}</div>
+          <div class="col">
+          {% if res.sleap_neural_network %}
+          {{res.sleap_neural_network.name}}
+          {%else%}
+          {{res.dlc_neural_network.name}}
+          {% endif%}
+          </div>
+          <div class="col">
+          {% if res.started_inference_at %}
+              {{res.started_inference_at.strftime("%d/%m/%Y %H:%M")}}
+          {% else %}
+              Не начат
+          {% endif %}
+          </div>
+          <div class="col">
+          {% if res.finished_inference_at %}
+              {{res.finished_inference_at.strftime("%d/%m/%Y %H:%M")}}
+          {% else %}
+              Не окончен
+          {% endif %}
+          </div>
+    </div>
+</a>
+{% endfor %}

@@ -4,12 +4,20 @@
 
 {% block content %}
 <div>
-    <p>
+    <h2>
         Вы действительно хотите удалить видео "{{video.name}}"?
+    </h2>
+    <p>
+        Если вы удалите видео, удалятся все результаты анализа этого видео:
     </p>
+    <div class="list-group mb-3">
+        {% include 'model_inference/list_results_frame.html'%}
+    </div>
+    
     <form method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        <button type="submit">Удалить</button>
+        <a href="{{video.get_absolute_url()}}" class="btn btn-primary">Назад</a>
+        <button type="submit" class="btn btn-danger">Удалить</button>
     </form>
 </div>
 {% endblock %}

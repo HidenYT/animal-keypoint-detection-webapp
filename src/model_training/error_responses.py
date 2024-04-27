@@ -11,5 +11,6 @@ class JSONHttpErrorResponse(HttpResponse):
             "name": response.__class__.__name__[len("HttpResponse"):],
             "description": response.content.decode(),
         })
+        self.status_code = response.status_code
         super().__init__(content, content_type="application/json")
         

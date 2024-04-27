@@ -22,6 +22,16 @@ class NeuralNetwork(models.Model):
 - train_dataset = models.ForeignKey(TrainDataset, on_delete=models.DO_NOTHING)
 - user = models.ForeignKey(User, on_delete=models.CASCADE)'''
 
+    ORDER_BY_OPTIONS = [
+        'neural_network_type',
+        'name',
+        'started_training_at',
+        'finished_training_at',
+        'test_fraction',
+        'num_epochs'
+    ]
+    ORDER_BY_OPTIONS += [f"-{opt}" for opt in ORDER_BY_OPTIONS]
+
     neural_network_type = models.CharField(choices=NeuralNetworkType.ALL_TYPES)
     name = models.CharField(max_length=200)
     model_uid = models.CharField(max_length=500)
@@ -69,7 +79,7 @@ class SLEAPNeuralNetwork(NeuralNetwork):
     heads_sigma = models.FloatField(validators=[greater_0])
     heads_output_stride = models.IntegerField(validators=[MinValueValidator(1)])
 
-    train_dataset = models.ForeignKey(TrainDataset, on_delete=models.DO_NOTHING, related_name='sleap_neural_networks')
+    train_dataset = models.ForeignKey(TrainDataset, on_delete=models.CASCADE, related_name='sleap_neural_networks')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sleap_neural_networks')
 
     def get_absolute_url(self) -> str:
@@ -90,7 +100,7 @@ class DLCNeuralNetwork(NeuralNetwork):
 
     backbone_model = models.CharField(choices=DLC_NET_TYPES)
 
-    train_dataset = models.ForeignKey(TrainDataset, on_delete=models.DO_NOTHING, related_name='dlc_neural_networks')
+    train_dataset = models.ForeignKey(TrainDataset, on_delete=models.CASCADE, related_name='dlc_neural_networks')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='dlc_neural_networks')
 
     def get_absolute_url(self) -> str:

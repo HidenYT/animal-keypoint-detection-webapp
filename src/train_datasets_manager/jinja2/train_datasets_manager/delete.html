@@ -3,13 +3,26 @@
 {% block title %} Удалить набор данных для обучения "{{dataset.name}}" {%endblock%}
 
 {% block content %}
-<div>
-    <p>
+<div class="p-1 container-xxl" >
+    <p class="h2">
         Вы действительно хотите удалить набор данных "{{dataset.name}}"?
     </p>
+    <p>
+        Если вы удалите этот набор данных, удалятся все нейронные сети, обученные на этом датасете
+    </p>
+    <div class="list-group mb-3">
+        {% include 'model_training/list_models_frame.html'%}
+    </div>
+    <p>
+        Также будут удалены следующие результаты анализа, созданные при помощи вышеперечисленных нейросетей:
+    </p>
+    <div class="list-group mb-3">
+        {% include 'model_inference/list_results_frame.html'%}
+    </div>
     <form method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        <button type="submit">Удалить</button>
+        <a href="{{dataset.get_absolute_url()}}" class="btn btn-primary">Назад</a>
+        <button type="submit" class="btn btn-danger">Удалить</button>
     </form>
 </div>
 {% endblock %}

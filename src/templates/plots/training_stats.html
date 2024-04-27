@@ -22,10 +22,16 @@
         return canvases;
     }
     function getTrainingStats() {
-        fetch("http://{{request.get_host()}}/network-training/training-stats/{{neural_network_type}}/{{net.pk}}").then((res) => {
-            return res.json();
+        fetch(
+            "http://{{request.get_host()}}/network-training/training-stats/{{neural_network_type}}/{{net.pk}}"
+        ).then((res) => {
+            if(res.status == 200) {
+                return res.json();
+            }
+            return null;
         }).then(
             (json) => {
+                if(json == null) return;
                 if(Object.keys(json).length == 0) return;
                 if(!createdCharts) {
                     canvasesAndCharts = createCanvases(Object.keys(json));
