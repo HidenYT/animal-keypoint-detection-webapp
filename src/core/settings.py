@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'model_training',
     'authentication',
     'index',
+    'crispy_forms',
+    "crispy_bootstrap5",
     
 ]
 
@@ -183,3 +185,8 @@ SLEAP_MICROSERVICE_URL = os.getenv("SLEAP_MICROSERVICE_URL")
 DLC_MICROSERVICE_URL = os.getenv("DLC_MICROSERVICE_URL")
 
 MICROSERVICES_AUTH_TOKEN = f"Bearer {os.getenv('MICROSERVICES_AUTH_TOKEN')}"
+
+# Crispy
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"

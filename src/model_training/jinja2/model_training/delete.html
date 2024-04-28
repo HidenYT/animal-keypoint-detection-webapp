@@ -5,6 +5,9 @@
 <h2>
     Вы действительно хотите удалить нейросеть "<a href={{net.get_absolute_url()}}>{{ net.name }}</a>"?
 </h2>
+<p>
+    Если вы удалите нейросеть, удалятся все результаты анализа этой нейросети:
+</p>
 <div class="list-group mb-3">
     {% include 'model_inference/list_results_frame.html'%}
 </div>

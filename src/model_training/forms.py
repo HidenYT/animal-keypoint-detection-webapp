@@ -25,6 +25,11 @@ class SLEAPNetworkTrainingForm(forms.ModelForm):
         widget=forms.Select(attrs={"onchange": "onBackboneModelChanged();"}))
     dataset = forms.ChoiceField()
 
+    def clean_pretrained_encoder(self):
+        if self.cleaned_data['backbone_model'] != 'pretrained_encoder': return
+        if self.cleaned_data['pretrained_encoder'] is None:
+            raise forms.ValidationError("You should specify a Pretrained encoder model if you choose 'Pretrained encoder' as a backbone")
+
     class Meta:
         model = SLEAPNeuralNetwork
         exclude = EXCLUDE_FIELDS

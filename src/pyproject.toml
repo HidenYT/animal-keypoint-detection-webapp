@@ -17,6 +17,8 @@ py7zr = "^0.20.8"
 redis = "^5.0.3"
 requests = "^2.31.0"
 opencv-python = "^4.9.0.80"
+django-crispy-forms = "^2.1"
+crispy-bootstrap5 = "^2024.2"
 
 
 [build-system]

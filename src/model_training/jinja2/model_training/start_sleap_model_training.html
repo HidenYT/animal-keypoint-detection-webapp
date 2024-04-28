@@ -6,19 +6,8 @@
 <div>
     <form method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        {% for field in form %}
-            {% if field.name == "pretrained_encoder" %}
-            <div style="display: none;" id="pretrained_encoder_container">
-            {% endif %}
-            {{field.errors}}
-            {{field.label_tag()}}
-            {{field}}
-            <br>
-            {% if field.name == "pretrained_encoder" %}
-            </div>
-            {% endif %}
-        {% endfor %}
-        <button type="submit">Начать обучение</button>
+        {{crispy(form)}}
+        <button type="submit" class="btn btn-primary">Начать обучение</button>
     </form>
 </div>
 <script>
@@ -28,7 +17,7 @@
     
     function onBackboneModelChanged() {
         let select = document.getElementById("{{ form.backbone_model.auto_id }}");
-        let pretrainedEncoderSelect = document.getElementById("pretrained_encoder_container");
+        let pretrainedEncoderSelect = document.getElementById("div_id_pretrained_encoder");
         if(select.value == "pretrained_encoder") {
             pretrainedEncoderSelect.style.display = "block";
         } else {
