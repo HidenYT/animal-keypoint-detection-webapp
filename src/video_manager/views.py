@@ -29,11 +29,6 @@ def list_inference_videos_view(request: HttpRequest):
     return render(request, "video_manager/list.html", ctx)
 
 @login_required
-def detail_inference_video_view(request: HttpRequest, id: int):
-    video = get_video(request, id)
-    return render(request, 'video_manager/detail.html', {"video": video})
-
-@login_required
 def upload_inference_video_view(request: HttpRequest):
     form = VideoUploadForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
@@ -44,7 +39,7 @@ def upload_inference_video_view(request: HttpRequest):
             video.user = request.user
             video.file = request.FILES['file']
             video.save()
-            return redirect(reverse('video_manager:detail_inference_video', kwargs={"id":video.pk}))
+            return redirect(reverse('video_manager:list_inference_videos'))
     return render(request, 'video_manager/upload.html', {"form": form})
 
 @login_required
@@ -59,7 +54,7 @@ def edit_inference_video_view(request: HttpRequest, id: int):
                 video.file = request.FILES['file']
             video.updated_at = datetime.now()
             video.save()
-            return redirect(reverse('video_manager:detail_inference_video', kwargs={"id":video.pk}))
+            return redirect(reverse('video_manager:list_inference_videos'))
     return render(request, 'video_manager/edit.html', {"form": form, "video": video})
 
 @login_required

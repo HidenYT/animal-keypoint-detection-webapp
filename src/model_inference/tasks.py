@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from uuid import uuid4
 from celery import Celery
@@ -36,7 +37,7 @@ def get_uncompleted_analysis_results():
             print(f"Didn't manage to connect to a microservice due to the error: {e}")
 
 @celery.task(bind=True)
-def generate_labeled_video_from_analysis_results(self, results_id: int):
+def generate_labeled_video_from_analysis_results(self, results_id: int, file_path: str):
     results = InferredKeypoints.objects.get(pk=results_id, keypoints__isnull=False)
     all_keypoints: dict[str, dict[str, list[float | None]]] = results.keypoints # type: ignore
     colors = {k: [randint(0, 255) for _ in range(3)] for k in all_keypoints["0"]}
@@ -44,11 +45,8 @@ def generate_labeled_video_from_analysis_results(self, results_id: int):
     fourcc = cv.VideoWriter.fourcc(*'mp4v')
     fps = cap.get(cv.CAP_PROP_FPS)
     frame_sz = int(cap.get(cv.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
-    _, ext = os.path.splitext(results.inference_video.file.path)
-    labeled_videos_dir_path = settings.LABELED_VIDEOS_DIR_PATH
-    os.makedirs(labeled_videos_dir_path, exist_ok=True)
-    labeled_video_path = os.path.join(labeled_videos_dir_path, f"{uuid4()}{ext}")
-    writer = cv.VideoWriter(labeled_video_path, fourcc, fps, frame_sz)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    writer = cv.VideoWriter(file_path, fourcc, fps, frame_sz)
     for frame_n, keypoints in all_keypoints.items():
         frame_n = int(frame_n)
         if frame_n%10 == 0: print(frame_n)
@@ -65,7 +63,9 @@ def generate_labeled_video_from_analysis_results(self, results_id: int):
             cv.putText(image, kp_name, text_coords, cv.FONT_HERSHEY_SIMPLEX, 1/3, color)
         writer.write(image)
     writer.release()
-    cap.release()    
+    cap.release()
+    results.labeled_video.finished_production_at = datetime.now()
+    results.labeled_video.save()
 
 
 @celery.on_after_finalize.connect

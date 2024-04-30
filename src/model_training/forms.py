@@ -33,3 +33,10 @@ class SLEAPNetworkTrainingForm(forms.ModelForm):
     class Meta:
         model = SLEAPNeuralNetwork
         exclude = EXCLUDE_FIELDS
+        
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["learning_rate"].initial = 1e-4
+        self.fields["heads_sigma"].initial = 2.5
+        self.fields["heads_output_stride"].initial = 1

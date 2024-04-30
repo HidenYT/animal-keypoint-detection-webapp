@@ -27,7 +27,3 @@ class TrainDataset(models.Model):
     updated_at = models.DateTimeField(default=datetime.now)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='train_datasets')
-
-
-    def get_absolute_url(self):
-        return reverse('train_datasets_manager:detail_train_dataset', kwargs={"id": self.pk})

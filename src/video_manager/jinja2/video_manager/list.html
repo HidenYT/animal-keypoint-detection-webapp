@@ -9,42 +9,19 @@
           <div class="col fw-bold" role="button" onclick="onSortVideosByFieldClickListener('name')">Название</div>
           <div class="col fw-bold" role="button" onclick="onSortVideosByFieldClickListener('created_at')">Загружено</div>
           <div class="col fw-bold" role="button" onclick="onSortVideosByFieldClickListener('updated_at')">Обновлено</div>
-          <div class="col fw-bold"></div>
         </div>
     </div>
     {% for video in videos %}
-    <div class="list-group-item list-group-item-action">
+    <div class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#descriptionCollapse{{loop.index}}">
         <div class="row">
             <div class="col fw-bold">{{ video.name }}</div>
             <div class="col">{{video.created_at.strftime("%d/%m/%Y %H:%M")}}</div>
             <div class="col">{{video.updated_at.strftime("%d/%m/%Y %H:%M")}}</div>
-            <div class="col">
-                <a href="{{ url('video_manager:inference_video_data', kwargs={'id': video.id}) }}" class="btn btn-outline-success">
-                    <i class="bi bi-cloud-arrow-down-fill"></i>
-                </a>
-                <a href="{{ url('video_manager:edit_inference_video', kwargs={'id': video.id}) }}" class="btn btn-outline-primary">
-                    <i class="bi bi-pencil-square"></i>
-                </a>
-                <a href="{{ url('video_manager:delete_inference_video', kwargs={'id': video.id}) }}" class="btn btn-outline-danger" >
-                    <i class="bi bi-trash-fill"></i>
-                </a>
-                <a data-bs-toggle="collapse" href="#descriptionCollapse{{loop.index}}" class="btn btn-outline-primary">
-                    <i class="bi bi-card-text"></i>
-                </a>
-            </div>
         </div>
     </div>
-    <div class="collapse" id="descriptionCollapse{{loop.index}}">
-        <div class="container p-2">
-            {% if video.description %}
-            {% for line in video.description.split('\n') %}
-            <p>{{line}}</p>
-            {% endfor %}
-            {% else %}
-            <span class="text-muted">Описание отсутствует</span>
-            {% endif %}
-        </div>
-      </div>
+    <div class="modal fade" id="descriptionCollapse{{loop.index}}" tabindex="-1" aria-labelledby="descriptionCollapse{{loop.index}}" aria-hidden="true">
+        {% include 'video_manager/detail_modal.html'%}
+    </div>
     {% endfor %}
 </div>
 {% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base/base.html" %}
+
+{% block title %}Удаление результата анализа видео{% endblock %}
+{% block content %}
+<h2>
+    Вы действительно хотите удалить <a href={{results.get_absolute_url()}}>результат анализа видео</a>?
+</h2>
+<p>
+    Отменить это действие будет невозможно.
+</p>
+<form method="POST">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <a href="{{ results.get_absolute_url() }}" class="btn btn-primary">Назад</a>
+    <button type="submit" class="btn btn-danger">Удалить</button>
+</form>
+{% endblock %}

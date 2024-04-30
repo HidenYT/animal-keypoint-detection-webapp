@@ -6,6 +6,8 @@ from .views import (
     start_sleap_network_inference_view,
     download_inference_results_view,
     run_labeled_video_generation_view,
+    download_labeled_video_view,
+    delete_analysis_results_view,
 )
 
 
@@ -18,4 +20,6 @@ urlpatterns = [
     path("", list_inference_results_view, name="list_inference_results"),
     path("<int:id>/download", download_inference_results_view, name="download_inference_results"),
     path("<int:id>/generate-labeled-video", run_labeled_video_generation_view, name="run_labeled_video_generation"),
+    path("<int:id>/download-labeled-video", download_labeled_video_view, name="download_labeled_video"),
+    path("<int:id>/delete", delete_analysis_results_view, name="delete_analysis_results"),
 ]

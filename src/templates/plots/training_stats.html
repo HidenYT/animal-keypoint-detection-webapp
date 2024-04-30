@@ -8,10 +8,10 @@
     let canvasesAndCharts = {};
     function createCanvases(labels) {
         let canvases = {};
-        let allCanvasesContainer = document.getElementById("all-canvases-container");
+        let allCanvasesContainer = document.getElementById("all-canvases-container").children[0];
         for(let label of labels) {
             let canvasContainer = document.createElement("div");
-            canvasContainer.style.width = "500px";
+            canvasContainer.classList.add("col");
             let canvas = document.createElement("canvas");
             canvas.id = label + "_canvas";
             canvasContainer.append(canvas);

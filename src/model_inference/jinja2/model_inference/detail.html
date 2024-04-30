@@ -1,39 +1,59 @@
 {% extends "base/base.html" %}
 
-{% block title %}Результаты для видео "{{kps.inference_video.name}}"{% endblock %}
+{% block title %}Результат анализа видео "{{kps.inference_video.name}}"{% endblock %}
 {% block content %}
 <div>
-    <h1>
-        Результаты для видео "{{ kps.inference_video.name }}" нейросети "{{net.name}}"
-    </h1>
-    <p>
-        Работа начата: {{ kps.started_inference_at.strftime("%d/%m/%Y %H:%M") }}
-    </p>
-    <p>
-        Работа окончена: 
-        {% if kps.finished_inference_at %}
-            {{ kps.finished_inference_at.strftime("%d/%m/%Y %H:%M") }}
-        {% else %}
-            ещё не окончена
-        {% endif %}
-    </p>
-    <p>
-        Нейросеть: 
-        <a href="{{ url(
-            'network_training:detail_trained_network', 
-            kwargs={
-                'id': net.pk, 
-                'neural_network_type': neural_network_type
-            }) 
-        }}">
-            {{ net.name }}
-        </a>
-    </p>
-    <p>
-        Видео: <a href="{{ url('video_manager:detail_inference_video', kwargs={'id': kps.inference_video.pk }) }}">{{ kps.inference_video.name }}</a>
-    </p>
+    <h2>
+        Результат анализа видео
+    </h2>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th scope="row">Видео</th>
+                <td>
+                    <a data-bs-toggle="modal" data-bs-target="#videoCollapse" class="link" type="button">{{kps.inference_video.name}}</a>
+                    {% with video = kps.inference_video %}
+                    <div class="modal fade" id="videoCollapse" tabindex="-1" aria-labelledby="videoCollapse" aria-hidden="true">
+                        {% include 'video_manager/detail_modal.html'%}
+                    </div>
+                    {% endwith %}
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Нейросеть</th>
+                <td>
+                    <a href="{{ url('network_training:detail_trained_network', kwargs={'id': net.pk, 'neural_network_type': neural_network_type})}}">
+                        {{ net.name }}
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Анализ начат</th>
+                <td>{{ kps.started_inference_at.strftime("%d/%m/%Y %H:%M") }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Анализ закончен</th>
+                <td>        
+                    {% if kps.finished_inference_at %}
+                    {{ kps.finished_inference_at.strftime("%d/%m/%Y %H:%M") }}
+                    {% else %}
+                        ещё не закончен
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
     {% if kps.keypoints %}
-        <a href="{{url('network_inference:download_inference_results', kwargs={'id': kps.pk})}}">Скачать результаты</a>
+        <a href="{{url('network_inference:download_inference_results', kwargs={'id': kps.pk})}}" class="btn btn-success"><i class="bi bi-cloud-arrow-down-fill"></i> Скачать результаты JSON</a>
+        {% if kps.labeled_video and kps.labeled_video.finished_production_at %}
+        <a href="{{url('network_inference:download_labeled_video', kwargs={'id': kps.pk})}}" class="btn btn-primary"><i class="bi bi-cloud-arrow-down-fill"></i> Скачать размеченное видео</a>
+        {% elif not kps.labeled_video%}
+        <a href="{{url('network_inference:run_labeled_video_generation', kwargs={'id': kps.pk})}}" class="btn btn-success"><i class="bi bi-cloud-arrow-down-fill"></i> Заказать размеченное видео</a>
+        {% elif kps.labeled_video %}
+        <div class="btn btn-primary disabled">Идёт разметка видео</div>
+        {% endif %}
     {% endif %}
+    <a href="{{url('network_inference:delete_analysis_results', kwargs={'id': kps.pk})}}" class="btn btn-danger">Удалить</a>
 </div>
 {% endblock %}

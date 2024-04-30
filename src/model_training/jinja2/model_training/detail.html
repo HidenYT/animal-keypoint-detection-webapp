@@ -3,35 +3,57 @@
 {% block title %}Нейросеть "{{ net.name }}"{% endblock %}
 {% block content %}
 <div>
-    <h1>
-        {{ net.name }}
-    </h1>
-    <p>
-        Обучение начато: {{ net.started_training_at.strftime("%d/%m/%Y %H:%M") }}
-    </p>
-    <p>
-        Обучение окончено: 
-        {% if net.finished_training_at %}
-            {{ net.finished_training_at.strftime("%d/%m/%Y %H:%M") }}
-        {% else %}
-            ещё не окончено
-        {% endif %}
-    </p>
-    <p>
-        Кодировщик: {{ net.backbone_model }}
-    </p>
-    <p>
-        Доля тестовых данных: {{ net.test_fraction }}
-    </p>
-    <p>
-        Количество эпох: {{ net.num_epochs }}
-    </p>
-    <p>
-        Датасет: <a href="{{ url('train_datasets_manager:detail_train_dataset', kwargs={'id': net.train_dataset.pk }) }}">{{ net.train_dataset.name }}</a>
-    </p>
-    <a href="{{ url('network_training:delete_trained_network', kwargs={'neural_network_type': 'DLC', 'id': net.pk})}}">Удалить</a>
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>
+            {{ net.name }}
+        </h2>
+        <a href="{{ url('network_training:delete_trained_network', kwargs={'neural_network_type': 'DLC', 'id': net.pk})}}" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+    </div>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th scope="row">Обучение начато</th>
+                <td>{{net.started_training_at.strftime("%d/%m/%Y %H:%M")}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Обучение окончено</th>
+                <td>        
+                    {% if net.finished_training_at %}
+                    {{ net.finished_training_at.strftime("%d/%m/%Y %H:%M") }}
+                    {% else %}
+                    ещё не окончено
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Кодировщик</th>
+                <td>{{ net.backbone_model }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Доля тестовых данных</th>
+                <td>{{ net.test_fraction }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Количество эпох</th>
+                <td>{{ net.num_epochs }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Датасет</th>
+                <td>
+                    <button data-bs-toggle="modal" data-bs-target="#datasetCollapse" class="btn btn-primary">{{net.train_dataset.name}}</button>
+                    {% with dataset = net.train_dataset%}
+                    <div class="modal fade" id="datasetCollapse" tabindex="-1" aria-labelledby="datasetCollapse" aria-hidden="true">
+                        {% include 'train_datasets_manager/detail_modal.html'%}
+                    </div>
+                    {% endwith %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
-<div id="all-canvases-container"></div>
+<div id="all-canvases-container">    <div class="row row-cols-2">
+        
+</div></div>
 {% with neural_network_type='DLC'%}
     {% include 'plots/training_stats.html'%}
 {% endwith %}

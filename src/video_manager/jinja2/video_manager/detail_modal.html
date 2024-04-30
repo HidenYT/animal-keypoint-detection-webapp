@@ -1,0 +1,40 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{ video.name }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">Загружено</th>
+                        <td>{{video.created_at.strftime("%d/%m/%Y %H:%M")}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Обновлено</th>
+                        <td>{{video.updated_at.strftime("%d/%m/%Y %H:%M")}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {% if video.description %}
+            {% for line in video.description.split('\n') %}
+            <p>{{line}}</p>
+            {% endfor %}
+            {% else %}
+            <p class="text-muted">Описание отсутствует</p>
+            {% endif %}
+            <div class="btn-group w-100">
+                <a href="{{ url('video_manager:inference_video_data', kwargs={'id': video.id}) }}" class="btn btn-outline-success">
+                    <i class="bi bi-cloud-arrow-down-fill"></i>
+                </a>
+                <a href="{{ url('video_manager:edit_inference_video', kwargs={'id': video.id}) }}" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+                <a href="{{ url('video_manager:delete_inference_video', kwargs={'id': video.id}) }}" class="btn btn-outline-danger" >
+                    <i class="bi bi-trash-fill"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

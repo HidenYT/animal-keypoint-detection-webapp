@@ -1,10 +1,14 @@
 from datetime import datetime
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from model_training.models import SLEAPNeuralNetwork, DLCNeuralNetwork
+from utils.file_uploads import default_upload_path
 from video_manager.models import InferenceVideo
 from django.contrib.auth.models import User
 
+def labeled_video_random_path(instance: "InferredKeypoints") -> str:
+    return default_upload_path(settings.LABELED_VIDEOS_DIR_PATH, instance.user, instance.inference_video.file.name)
 
 class InferredKeypoints(models.Model):
     ORDER_BY_OPTIONS = [
@@ -50,3 +54,9 @@ class InferredKeypoints(models.Model):
     
     def get_absolute_url(self):
         return reverse("network_inference:detail_inference_results", kwargs={"id": self.pk})
+
+class LabeledVideo(models.Model):
+    analysis_results = models.OneToOneField(InferredKeypoints, on_delete=models.CASCADE, related_name="labeled_video")
+    started_production_at = models.DateTimeField(default=datetime.now)
+    finished_production_at = models.DateTimeField(null=True, blank=True)
+    file_path = models.CharField()

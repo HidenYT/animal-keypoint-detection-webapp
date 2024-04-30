@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Iterable
 from uuid import UUID
 from django.http import HttpRequest, HttpResponse
@@ -6,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from model_inference.forms import RunTrainedNetworkForm
-from model_inference.models import InferredKeypoints
+from model_inference.models import InferredKeypoints, LabeledVideo, labeled_video_random_path
 from model_inference.tasks import generate_labeled_video_from_analysis_results
 from model_training.models import DLCNeuralNetwork, NeuralNetwork, NeuralNetworkType, SLEAPNeuralNetwork
 from utils.list_sort import get_sorted_objects
@@ -16,6 +17,7 @@ from utils.microservices.microservice import Microservice
 from utils.microservices.sleap_microservice import SLEAP_MICROSERVICE
 from video_manager.models import InferenceVideo
 from requests import ConnectionError
+from django_sendfile import sendfile
 
 
 def video_analysis_view(request: HttpRequest, network_class: type[NeuralNetwork], microservice: Microservice):
@@ -101,6 +103,27 @@ def list_inference_results_view(request: HttpRequest):
 
 @login_required
 def run_labeled_video_generation_view(request: HttpRequest, id: int):
-    get_object_or_404(InferredKeypoints, pk=id, user=request.user, keypoints__isnull=False)
-    generate_labeled_video_from_analysis_results.delay(id)
+    analysis_results = get_object_or_404(InferredKeypoints, pk=id, user=request.user, keypoints__isnull=False)
+    if not hasattr(analysis_results, 'labeled_video') or analysis_results.labeled_video is None:
+        random_path = labeled_video_random_path(analysis_results)
+        LabeledVideo.objects.create(analysis_results=analysis_results, file_path=random_path)
+        generate_labeled_video_from_analysis_results.delay(id, random_path)
     return redirect("network_inference:detail_inference_results", id=id)
+
+@login_required
+def download_labeled_video_view(request: HttpRequest, id: int):
+    results = get_object_or_404(InferredKeypoints, pk=id, user=request.user, keypoints__isnull=False, labeled_video__isnull=False, labeled_video__finished_production_at__isnull=False)
+    _, ext = os.path.splitext(results.labeled_video.file_path)
+    return sendfile(request, 
+                    results.labeled_video.file_path, 
+                    attachment=True, 
+                    attachment_filename=f'Labeled video for {results.inference_video.name}{ext}',
+                    )
+
+@login_required
+def delete_analysis_results_view(request: HttpRequest, id: int):
+    results = get_object_or_404(InferredKeypoints, pk=id, user=request.user)
+    if request.method == "POST":
+        results.delete()
+        return redirect("network_inference:list_inference_results")
+    return render(request, "model_inference/delete.html", {"results": results})

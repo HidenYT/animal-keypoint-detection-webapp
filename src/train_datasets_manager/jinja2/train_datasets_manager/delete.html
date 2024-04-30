@@ -21,7 +21,7 @@
     </div>
     <form method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        <a href="{{dataset.get_absolute_url()}}" class="btn btn-primary">Назад</a>
+        <a href="{{url('train_datasets_manager:list_train_datasets')}}" class="btn btn-primary">Назад</a>
         <button type="submit" class="btn btn-danger">Удалить</button>
     </form>
 </div>

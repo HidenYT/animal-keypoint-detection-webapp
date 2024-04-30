@@ -10,4 +10,3 @@ class DatasetEditForm(forms.ModelForm):
     class Meta:
         model = TrainDataset
         exclude = ['created_at', 'updated_at', 'user', 'file']
-    file = forms.FileField(required=False)

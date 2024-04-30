@@ -16,7 +16,7 @@
     
     <form method="post">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        <a href="{{video.get_absolute_url()}}" class="btn btn-primary">Назад</a>
+        <a href="{{url('video_manager:list_inference_videos')}}" class="btn btn-primary">Назад</a>
         <button type="submit" class="btn btn-danger">Удалить</button>
     </form>
 </div>

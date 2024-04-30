@@ -1,0 +1,40 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{ dataset.name }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">            
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">Загружено</th>
+                        <td>{{dataset.created_at.strftime("%d/%m/%Y %H:%M")}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Обновлено</th>
+                        <td>{{dataset.updated_at.strftime("%d/%m/%Y %H:%M")}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {% if dataset.description %}
+            {% for line in dataset.description.split('\n') %}
+            <p>{{line}}</p>
+            {% endfor %}
+            {% else %}
+            <p class="text-muted">Описание отсутствует</p>
+            {% endif %}            
+            <div class="btn-group w-100">
+                <a href="{{ url('train_datasets_manager:train_dataset_data', kwargs={'id': dataset.id}) }}" class="btn btn-outline-success">
+                    <i class="bi bi-cloud-arrow-down-fill"></i>
+                </a>
+                <a href="{{ url('train_datasets_manager:edit_train_dataset', kwargs={'id': dataset.id}) }}" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+                <a href="{{ url('train_datasets_manager:delete_train_dataset', kwargs={'id': dataset.id}) }}" class="btn btn-outline-danger" >
+                    <i class="bi bi-trash-fill"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

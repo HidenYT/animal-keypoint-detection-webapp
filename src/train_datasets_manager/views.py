@@ -30,11 +30,6 @@ def list_train_datasets_view(request: HttpRequest):
     return render(request, 'train_datasets_manager/list.html', ctx)
 
 @login_required
-def detail_train_dataset_view(request: HttpRequest, id: int):
-    dataset = get_dataset(request, id)
-    return render(request, 'train_datasets_manager/detail.html', {"dataset": dataset})
-
-@login_required
 def upload_train_dataset_view(request: HttpRequest):
     form = DatasetUploadForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
@@ -45,7 +40,7 @@ def upload_train_dataset_view(request: HttpRequest):
             dataset.user = request.user
             dataset.file = request.FILES['file']
             dataset.save()
-            return redirect(reverse('train_datasets_manager:detail_train_dataset', kwargs={"id":dataset.pk}))
+            return redirect(reverse('train_datasets_manager:list_train_datasets'))
     return render(request, 'train_datasets_manager/upload.html', {"form": form})
 
 @login_required
@@ -60,7 +55,7 @@ def edit_train_dataset_view(request: HttpRequest, id: int):
                 dataset.file = request.FILES['file']
             dataset.updated_at = datetime.now()
             dataset.save()
-            return redirect(reverse('train_datasets_manager:detail_train_dataset', kwargs={"id":dataset.pk}))
+            return redirect(reverse('train_datasets_manager:list_train_datasets'))
     return render(request, 'train_datasets_manager/edit.html', {"form": form, "dataset": dataset})
 
 @login_required
