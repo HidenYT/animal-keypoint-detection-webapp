@@ -29,6 +29,7 @@ class SLEAPNetworkTrainingForm(forms.ModelForm):
         if self.cleaned_data['backbone_model'] != 'pretrained_encoder': return
         if self.cleaned_data['pretrained_encoder'] is None:
             raise forms.ValidationError("You should specify a Pretrained encoder model if you choose 'Pretrained encoder' as a backbone")
+        return self.cleaned_data['pretrained_encoder']
 
     class Meta:
         model = SLEAPNeuralNetwork
