@@ -69,7 +69,8 @@ class SLEAPNeuralNetwork(NeuralNetwork):
         ('seresnet18', 'seresnet18'), ('seresnet34', 'seresnet34'), ('seresnet50', 'seresnet50'), ('seresnet101', 'seresnet101'), ('seresnet152', 'seresnet152'), 
         ('seresnext50', 'seresnext50'), ('seresnext101', 'seresnext101'), ('senet154', 'senet154'), 
         ('mobilenet', 'mobilenet'), ('mobilenetv2', 'mobilenetv2'), 
-        ('efficientnetb0', 'efficientnetb0'), ('efficientnetb1', 'efficientnetb1'), ('efficientnetb2', 'efficientnetb2'), ('efficientnetb3', 'efficientnetb3'), ('efficientnetb4', 'efficientnetb4'), ('efficientnetb5', 'efficientnetb5')
+        ('efficientnetb0', 'efficientnetb0'), ('efficientnetb1', 'efficientnetb1'), ('efficientnetb2', 'efficientnetb2'), ('efficientnetb3', 'efficientnetb3'), ('efficientnetb4', 'efficientnetb4'), ('efficientnetb5', 'efficientnetb5'),
+        ('efficientnetb6', 'efficientnetb6'), ('efficientnetb7', 'efficientnetb7')
     ]
     neural_network_type = models.CharField(default=NeuralNetworkType.SLEAP)
 
@@ -94,6 +95,13 @@ class DLCNeuralNetwork(NeuralNetwork):
         ("mobilenet_v2_0.75", "MobileNet v2-0.75"),
         ("mobilenet_v2_0.5", "MobileNet v2-0.5"),
         ("mobilenet_v2_0.35", "MobileNet v2-0.35"),
+        ("efficientnet-b0", "EfficientNet b0"),
+        ("efficientnet-b1", "EfficientNet b1"),
+        ("efficientnet-b2", "EfficientNet b2"),
+        ("efficientnet-b3", "EfficientNet b3"),
+        ("efficientnet-b4", "EfficientNet b4"),
+        ("efficientnet-b5", "EfficientNet b5"),
+        ("efficientnet-b6", "EfficientNet b6"),
     ]
 
     neural_network_type = models.CharField(default=NeuralNetworkType.DLC)
