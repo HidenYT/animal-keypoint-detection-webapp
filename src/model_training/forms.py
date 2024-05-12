@@ -12,7 +12,7 @@ EXCLUDE_FIELDS = [
 ]
 
 class DeeplabcutNetworkTrainingForm(forms.ModelForm):
-    dataset = forms.ChoiceField()
+    dataset = forms.ChoiceField(label="Датасет")
 
     class Meta:
         model = DLCNeuralNetwork
@@ -22,8 +22,9 @@ class DeeplabcutNetworkTrainingForm(forms.ModelForm):
 class SLEAPNetworkTrainingForm(forms.ModelForm):
     backbone_model = forms.ChoiceField(
         choices=SLEAPNeuralNetwork.BACKBONE_MODELS, 
-        widget=forms.Select(attrs={"onchange": "onBackboneModelChanged();"}))
-    dataset = forms.ChoiceField()
+        widget=forms.Select(attrs={"onchange": "onBackboneModelChanged();"}),
+        label="Архитектура нейросети")
+    dataset = forms.ChoiceField(label="Датасет")
 
     def clean_pretrained_encoder(self):
         if self.cleaned_data['backbone_model'] != 'pretrained_encoder': return

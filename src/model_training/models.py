@@ -33,14 +33,14 @@ class NeuralNetwork(models.Model):
     ORDER_BY_OPTIONS += [f"-{opt}" for opt in ORDER_BY_OPTIONS]
 
     neural_network_type = models.CharField(choices=NeuralNetworkType.ALL_TYPES)
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, verbose_name="Название")
     model_uid = models.CharField(max_length=500)
     started_training_at = models.DateTimeField(default=datetime.now)
     finished_training_at = models.DateTimeField(null=True, blank=True)
     
     # Общие для всех параметры обучения
-    test_fraction = models.FloatField(validators=[MinValueValidator(0), less_1])
-    num_epochs = models.IntegerField(validators=[MinValueValidator(1)])
+    test_fraction = models.FloatField(validators=[MinValueValidator(0), less_1], verbose_name="Доля тестовых данных")
+    num_epochs = models.IntegerField(validators=[MinValueValidator(1)], verbose_name="Количество эпох")
 
     train_dataset: models.ForeignKey
     user: models.ForeignKey
@@ -75,10 +75,10 @@ class SLEAPNeuralNetwork(NeuralNetwork):
     neural_network_type = models.CharField(default=NeuralNetworkType.SLEAP)
 
     learning_rate = models.FloatField(validators=[greater_0])
-    backbone_model = models.CharField(choices=BACKBONE_MODELS)
-    pretrained_encoder = models.CharField(choices=PRETRAINED_ENCODERS, null=True, blank=True)
-    heads_sigma = models.FloatField(validators=[greater_0])
-    heads_output_stride = models.IntegerField(validators=[MinValueValidator(1)])
+    backbone_model = models.CharField(choices=BACKBONE_MODELS, verbose_name="Архитектура нейросети")
+    pretrained_encoder = models.CharField(choices=PRETRAINED_ENCODERS, null=True, blank=True, verbose_name="Архитектура предобученной нейросети")
+    heads_sigma = models.FloatField(validators=[greater_0], verbose_name="Размах нормального распределения вокруг ключевой точки")
+    heads_output_stride = models.IntegerField(validators=[MinValueValidator(1)], verbose_name="Шаг в выходном слое")
 
     train_dataset = models.ForeignKey(TrainDataset, on_delete=models.CASCADE, related_name='sleap_neural_networks')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sleap_neural_networks')
@@ -106,9 +106,9 @@ class DLCNeuralNetwork(NeuralNetwork):
 
     neural_network_type = models.CharField(default=NeuralNetworkType.DLC)
 
-    backbone_model = models.CharField(choices=DLC_NET_TYPES)
+    backbone_model = models.CharField(choices=DLC_NET_TYPES, verbose_name="Архитектура нейросети")
 
-    train_dataset = models.ForeignKey(TrainDataset, on_delete=models.CASCADE, related_name='dlc_neural_networks')
+    train_dataset = models.ForeignKey(TrainDataset, on_delete=models.CASCADE, related_name='dlc_neural_networks', verbose_name="Датасет")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='dlc_neural_networks')
 
     def get_absolute_url(self) -> str:
