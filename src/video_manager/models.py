@@ -17,13 +17,14 @@ class InferenceVideo(models.Model):
     ]
     ORDER_BY_OPTIONS += [f"-{opt}" for opt in ORDER_BY_OPTIONS]
 
-    name = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
+    name = models.CharField(max_length=200, verbose_name="Название")
+    description = models.TextField(blank=True, verbose_name="Описание")
 
     file = models.FileField(upload_to=inference_video_upload_path,
                             validators=[
                                 FileExtensionValidator(["mp4", "avi", "mov"]),
-                            ])
+                            ],
+                            verbose_name="Файл")
 
     created_at = models.DateTimeField(default=datetime.now)
     updated_at = models.DateTimeField(default=datetime.now)
